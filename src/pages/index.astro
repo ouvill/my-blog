@@ -1,0 +1,67 @@
+---
+import BaseLayout from "@components/BaseLayout.astro"
+import PostCard from "@components/PostCard.astro"
+import { getAllPosts } from "@lib/posts"
+import { getPaginationInfo, getPageSlice } from "@lib/pagination"
+import { SITE_CONFIG } from "@lib/site"
+
+const allPosts = await getAllPosts()
+const pagination = getPaginationInfo(allPosts.length, 0)
+const pagePosts = getPageSlice(allPosts, 0)
+const defaultOgImage = `${SITE_CONFIG.url}/site-header.jpg`
+---
+
+<BaseLayout title={SITE_CONFIG.title} isHome={true} image={defaultOgImage}>
+  <div class="index-wrap">
+    <div class="post-grid">
+      {pagePosts.map((post) => (
+        <PostCard post={post} />
+      ))}
+    </div>
+
+    <nav class="pagination-nav">
+      <span></span>
+      {pagination.next !== null && (
+        <a href={`/indexes/${pagination.next}/`} class="pagination-link">
+          次 →
+        </a>
+      )}
+    </nav>
+  </div>
+</BaseLayout>
+
+<style>
+  .index-wrap {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  .post-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .pagination-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+  }
+
+  .pagination-link {
+    display: inline-block;
+    padding: 8px 24px;
+    border: 1px solid #f48fb1;
+    border-radius: 4px;
+    color: #f48fb1;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 200ms ease;
+  }
+
+  .pagination-link:hover {
+    background: #f48fb1;
+    color: white;
+  }
+</style>

@@ -1,0 +1,118 @@
+---
+import { SITE_CONFIG } from "@lib/site"
+import Header from "./Header.astro"
+import Footer from "./Footer.astro"
+
+export interface Props {
+  title: string
+  description?: string
+  image?: string
+  /** Whether to show the full "home" header */
+  isHome?: boolean
+  /** The canonical URL for this page (used for SEO) */
+  canonicalUrl?: string
+}
+
+const {
+  title,
+  description = SITE_CONFIG.description,
+  image,
+  isHome = false,
+  canonicalUrl,
+} = Astro.props
+
+const pageTitle = `${title} | ${SITE_CONFIG.title}`
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    {image && <meta property="og:image" content={image} />}
+    {image && <meta name="twitter:image" content={image} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content={"@" + SITE_CONFIG.twitter} />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    <title>{pageTitle}</title>
+    <link
+      rel="icon"
+      href="/favicon.ico"
+      type="image/x-icon"
+    />
+  </head>
+  <body>
+    <div class="root">
+      <div class="content">
+        <Header isHome={isHome} />
+        <main>
+          <slot />
+        </main>
+        <Footer />
+      </div>
+    </div>
+  </body>
+</html>
+
+<style>
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans CJK JP",
+      "メイリオ", Meiryo, sans-serif;
+    color: #333;
+    background-color: #f5f5f5;
+    line-height: 1.7;
+  }
+
+  a {
+    transition: all 200ms ease;
+    color: #8bc34a;
+    text-decoration: underline;
+  }
+
+  a:hover {
+    color: #9ccc65;
+    opacity: 0.8;
+  }
+
+  .root {
+    position: relative;
+    width: auto;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+  }
+
+  .content {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  main {
+    position: relative;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    max-width: 960px;
+    margin: 24px auto;
+    padding: 0 16px;
+    width: 100%;
+  }
+</style>

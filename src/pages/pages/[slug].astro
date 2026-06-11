@@ -1,0 +1,61 @@
+---
+import type { CollectionEntry } from "astro:content"
+import BaseLayout from "@components/BaseLayout.astro"
+import { getAllPages } from "@lib/posts"
+import { entryIdToSlug, pageUrlPath } from "@lib/slug"
+import { SITE_CONFIG } from "@lib/site"
+
+export interface Params {
+  slug: string
+}
+
+export async function getStaticPaths() {
+  const pages = await getAllPages()
+  return pages.map((p: CollectionEntry<"pages">) => ({
+    params: { slug: entryIdToSlug(p.id) },
+  }))
+}
+
+const { slug } = Astro.params
+const allPages = await getAllPages()
+const page = allPages.find(
+  (p: CollectionEntry<"pages">) => entryIdToSlug(p.id) === slug,
+)
+
+if (!page) {
+  return Astro.redirect("/404", 404)
+}
+
+const { Content } = await page.render()
+const canonicalUrl = `${SITE_CONFIG.url}${pageUrlPath(entryIdToSlug(page.id))}`
+---
+
+<BaseLayout title={page.data.title} canonicalUrl={canonicalUrl}>
+  <article class="page-paper">
+    <h1>{page.data.title}</h1>
+    <div class="page-content">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .page-paper {
+    background: white;
+    border-radius: 4px;
+    padding: 24px;
+    max-width: 760px;
+    margin: 0 auto;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .page-content {
+    line-height: 1.8;
+  }
+
+  .page-content h2,
+  .page-content h3,
+  .page-content h4 {
+    margin-top: 1.5em;
+  }
+</style>

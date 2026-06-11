@@ -1,0 +1,111 @@
+---
+export interface Props {
+  url: string
+  title: string
+}
+
+const { url, title } = Astro.props
+const encodedUrl = encodeURIComponent(url)
+const encodedTitle = encodeURIComponent(title)
+---
+
+<ul class="share-list">
+  <li class="share-item">
+    <a
+      href={`https://twitter.com/intent/tweet?text=${encodedTitle}&url=${encodedUrl}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="share-link twitter"
+    >
+      Twitter
+    </a>
+  </li>
+  <li class="share-item">
+    <a
+      href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="share-link facebook"
+    >
+      Facebook
+    </a>
+  </li>
+  <li class="share-item">
+    <a
+      href={`https://social-plugins.line.me/lineit/share?url=${encodedUrl}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="share-link line"
+    >
+      LINE
+    </a>
+  </li>
+  <li class="share-item">
+    <a
+      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="share-link linkedin"
+    >
+      LinkedIn
+    </a>
+  </li>
+  <li class="share-item">
+    <a
+      href={`mailto:?subject=${encodedTitle}&body=${encodedUrl}`}
+      class="share-link email"
+    >
+      Email
+    </a>
+  </li>
+</ul>
+
+<style>
+  .share-list {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    justify-content: center;
+    gap: 8px;
+    list-style: none;
+  }
+
+  .share-item {
+    list-style-type: none;
+  }
+
+  .share-link {
+    display: inline-block;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: all 200ms ease;
+  }
+
+  .share-link:hover {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+
+  .twitter {
+    background: #1da1f2;
+    color: white;
+  }
+  .facebook {
+    background: #1877f2;
+    color: white;
+  }
+  .line {
+    background: #00c300;
+    color: white;
+  }
+  .linkedin {
+    background: #0a66c2;
+    color: white;
+  }
+  .email {
+    background: #666;
+    color: white;
+  }
+</style>

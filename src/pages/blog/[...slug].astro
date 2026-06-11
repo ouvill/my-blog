@@ -1,0 +1,344 @@
+---
+import BaseLayout from "@components/BaseLayout.astro"
+import Bio from "@components/Bio.astro"
+import ShareLinks from "@components/ShareLinks.astro"
+import { getAllPosts } from "@lib/posts"
+import { entryIdToSlug, blogUrlPath } from "@lib/slug"
+import { SITE_CONFIG } from "@lib/site"
+import { resolveCover } from "@lib/cover"
+import type { MarkdownHeading } from "astro"
+
+export interface Params {
+  slug: string
+}
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts()
+  return posts.map((post) => {
+    const slug = entryIdToSlug(post.id)
+    // Astro's [...slug] catch-all receives the full remainder as a single string,
+    // so we pass the full slug directly (e.g., "foo" or "foo/bar").
+    return {
+      params: { slug },
+    }
+  })
+}
+
+const { slug } = Astro.params
+// Astro's [...slug] passes the full remainder as a single string; default to empty
+const fullSlug = slug ?? ""
+
+// Find the post by slug
+const posts = await getAllPosts()
+const post = posts.find((p) => entryIdToSlug(p.id) === fullSlug)
+
+if (!post) {
+  return Astro.redirect("/404", 404)
+}
+
+const { Content, headings } = await post.render()
+
+const canonicalUrl = `${SITE_CONFIG.url}${blogUrlPath(fullSlug)}`
+const coverUrl = resolveCover(post)
+const ogImage = `${SITE_CONFIG.url}${coverUrl}`
+
+const dateStr = post.data.date.toLocaleDateString("ja-JP", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+})
+
+// Collect unified tags (support both `tags` and legacy `tag` fields)
+const allTags = [
+  ...(post.data.tags ?? []),
+  ...(post.data.tag ?? []),
+]
+
+// Previous/next posts
+const currentIndex = posts.findIndex((p) => entryIdToSlug(p.id) === fullSlug)
+const prevPost =
+  currentIndex < posts.length - 1 ? posts[currentIndex + 1] : null
+const nextPost = currentIndex > 0 ? posts[currentIndex - 1] : null
+
+// Recent posts (3 latest, excluding current)
+const recentPosts = posts
+  .filter((p) => entryIdToSlug(p.id) !== fullSlug)
+  .slice(0, 3)
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description ?? undefined}
+  image={ogImage}
+  canonicalUrl={canonicalUrl}
+>
+  <div class="blog-layout">
+    <aside class="sidebar-left">
+      {headings.length > 0 && (
+        <div class="toc-wrap">
+          <h3 class="toc-title">目次</h3>
+          <ul class="toc-list">
+            {headings.filter((h: MarkdownHeading) => h.depth >= 2 && h.depth <= 3).map((h: MarkdownHeading) => (
+              <li style={`padding-left: ${(h.depth - 2) * 16}px`}>
+                <a href={`#${h.slug}`}>{h.text}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </aside>
+
+    <article class="blog-main">
+      <div class="blog-paper">
+        <h1 class="blog-title">{post.data.title}</h1>
+        <p class="blog-date">{dateStr}</p>
+
+        {allTags.length > 0 && (
+          <div class="blog-tags">
+            {allTags.map((tag) => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
+        )}
+
+        <div class="blog-content">
+          <Content />
+        </div>
+
+        <hr />
+
+        <ShareLinks
+          url={canonicalUrl}
+          title={`${post.data.title} | ${SITE_CONFIG.title}`}
+        />
+
+        <Bio />
+
+        <nav class="post-nav">
+          {nextPost && (
+            <a
+              href={blogUrlPath(entryIdToSlug(nextPost.id))}
+              rel="next"
+              class="post-nav-link prev"
+            >
+              ← {nextPost.data.title}
+            </a>
+          )}
+          {prevPost && (
+            <a
+              href={blogUrlPath(entryIdToSlug(prevPost.id))}
+              rel="prev"
+              class="post-nav-link next"
+            >
+              {prevPost.data.title} →
+            </a>
+          )}
+        </nav>
+
+        {recentPosts.length > 0 && (
+          <section class="recent-posts">
+            <h3>最新記事</h3>
+            <ul>
+              {recentPosts.map((rp) => (
+                <li>
+                  <a href={blogUrlPath(entryIdToSlug(rp.id))}>
+                    {rp.data.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
+    </article>
+
+    <aside class="sidebar-right">
+      <img
+        src="/cherry-blossom-large.svg"
+        alt=""
+        class="cherry-blossom"
+        width="320"
+      />
+    </aside>
+  </div>
+</BaseLayout>
+
+<style>
+  .blog-layout {
+    display: flex;
+    gap: 16px;
+  }
+
+  .sidebar-left {
+    display: none;
+    width: 240px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-right {
+    display: none;
+    width: 200px;
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 960px) {
+    .sidebar-left {
+      display: block;
+    }
+    .sidebar-right {
+      display: flex;
+      align-items: flex-end;
+    }
+  }
+
+  .toc-wrap {
+    background: white;
+    border-radius: 4px;
+    padding: 16px;
+    position: sticky;
+    top: 100px;
+    max-height: calc(90vh - 50px);
+    overflow-y: auto;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  }
+
+  .toc-title {
+    margin: 0 0 8px;
+    font-size: 0.95rem;
+  }
+
+  .toc-wrap a {
+    color: #8bc34a;
+  }
+
+  .toc-wrap ul {
+    padding: 0;
+    list-style: none;
+  }
+
+  .toc-wrap ul ul {
+    padding-left: 16px;
+  }
+
+  .toc-wrap li {
+    margin-top: 0.6em;
+  }
+
+  .blog-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .blog-paper {
+    background: white;
+    border-radius: 4px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .blog-title {
+    margin: 0 0 8px;
+    font-size: 1.75rem;
+    line-height: 1.4;
+  }
+
+  .blog-date {
+    color: #888;
+    font-size: 0.9rem;
+    margin: 0 0 12px;
+  }
+
+  .blog-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 16px;
+  }
+
+  .tag {
+    background: #fce4ec;
+    color: #f48fb1;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+  }
+
+  .blog-content {
+    line-height: 1.8;
+  }
+
+  .blog-content h2,
+  .blog-content h3,
+  .blog-content h4 {
+    margin-top: 1.5em;
+  }
+
+  .blog-content pre {
+    background-color: #fdf6e3;
+    border-radius: 0.3em;
+    padding: 1em;
+    overflow-x: auto;
+  }
+
+  .blog-content code {
+    font-family: "SF Mono", "Fira Code", "Fira Mono", monospace;
+  }
+
+  .blog-content img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  hr {
+    margin: 24px 0;
+    border: none;
+    border-top: 1px solid #eee;
+  }
+
+  .post-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    list-style: none;
+    padding: 0;
+    margin: 24px 0;
+    gap: 8px;
+  }
+
+  .post-nav-link {
+    max-width: 50%;
+    text-decoration: none;
+    color: #8bc34a;
+    font-size: 0.95rem;
+  }
+
+  .post-nav-link:hover {
+    text-decoration: underline;
+  }
+
+  .recent-posts {
+    margin-top: 24px;
+  }
+
+  .recent-posts h3 {
+    font-size: 1.1rem;
+  }
+
+  .recent-posts ul {
+    padding-left: 20px;
+  }
+
+  .recent-posts li {
+    margin-bottom: 8px;
+  }
+
+  .cherry-blossom {
+    position: sticky;
+    bottom: 5%;
+    width: 50%;
+    max-height: 40%;
+    opacity: 0.3;
+  }
+</style>

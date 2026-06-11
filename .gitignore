@@ -1,4 +1,8 @@
-public
+# Build output
+dist/
+
+# Astro cache
+.astro/
 
 .pnpm-store
 # Created by https://www.toptal.com/developers/gitignore/api/node

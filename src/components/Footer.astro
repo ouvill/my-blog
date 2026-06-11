@@ -1,0 +1,36 @@
+---
+const year = new Date().getFullYear()
+---
+
+<footer class="site-footer">
+  <p>
+    <a href="/pages/privacy_policy/">プライバシーポリシー</a>
+  </p>
+  <p>
+    &copy; {year}, Designed and Written by Ouvill, Built with Astro
+  </p>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 32px;
+    min-height: 64px;
+    background-color: #f48fb1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    color: white;
+    padding: 16px 24px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .site-footer a {
+    color: white;
+    text-decoration: underline;
+  }
+
+  .site-footer p {
+    margin: 0;
+  }
+</style>

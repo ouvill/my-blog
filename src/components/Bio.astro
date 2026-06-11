@@ -1,0 +1,53 @@
+---
+import { SITE_CONFIG } from "@lib/site"
+---
+
+<div class="bio">
+  <img
+    class="bio-avatar"
+    src="/profile-pic.png"
+    alt={SITE_CONFIG.author}
+    width="64"
+    height="64"
+  />
+  <div class="bio-text">
+    <p>
+      この記事は{SITE_CONFIG.author}が書きました。IT関連の記事執筆やサイト作成や、ウェブアプリケーション開発の業務委託などのご依頼を賜っております。
+    </p>
+    <p>
+      ご要件がある方は<a href="/contact">コンタクトフォーム</a>からご連絡ください。
+    </p>
+    <p>
+      <a href="https://twitter.com/{SITE_CONFIG.twitter}">
+        @{SITE_CONFIG.twitter}
+      </a>
+    </p>
+  </div>
+</div>
+
+<style>
+  .bio {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 0;
+  }
+
+  .bio-avatar {
+    border-radius: 50%;
+    min-width: 64px;
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+  }
+
+  .bio-text p {
+    margin: 0 0 8px;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .bio-text p:last-child {
+    margin-bottom: 0;
+  }
+</style>
