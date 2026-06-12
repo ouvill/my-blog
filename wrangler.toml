@@ -1,12 +1,20 @@
-# Cloudflare Pages configuration
-# Docs: https://developers.cloudflare.com/pages/configuration/wrangler-configuration/
+# Cloudflare Workers configuration
+# Docs: https://developers.cloudflare.com/workers/
 #
-# Environment variables (CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL, NODE_VERSION)
+# Environment variables (CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL)
 # are managed in the Cloudflare dashboard, not in this file.
 
 name = "ouvill-blog"
-pages_build_output_dir = "dist"
 compatibility_date = "2026-06-12"
+main = "src/worker.ts"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+# Match Astro's `trailingSlash: "always"` behaviour and serve 404.html for
+# unmatched routes (Astro generates dist/404.html from src/pages/404.astro).
+html_handling = "force-trailing-slash"
+not_found_handling = "404-page"
 
 # Cloudflare Email Service — Email Sending binding
 # Docs: https://developers.cloudflare.com/email-service/
@@ -31,5 +39,8 @@ binding = "CONTACT_DB"
 database_name = "ouvill-blog-contact-prod"
 database_id = "6ffa8f11-d0bf-47c1-ac74-8965c974b770"
 #
-# NOTE: Until the D1 binding is configured, the contact form will return
-# `server_error` because submissions cannot be persisted.
+# NOTE: The D1 binding is configured (database_id set above), but the
+# contact form requires the `contact_submissions` table to exist.
+# Run the migration to create it:
+#   wrangler d1 execute ouvill-blog-contact-prod --remote \
+#     --file=./migrations/0001_create_contact_submissions.sql

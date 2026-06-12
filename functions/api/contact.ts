@@ -1,5 +1,6 @@
 /**
- * Cloudflare Pages Function — Contact form handler.
+ * Contact form handler — used as a Cloudflare Pages Function and also
+ * imported directly by the Workers entry (`src/worker.ts`).
  *
  * Receives a POST from /contact/, validates the input, optionally sends an
  * email via the Cloudflare Email Service Workers binding, and redirects the
@@ -83,7 +84,7 @@ interface D1Database {
 // ---------------------------------------------------------------------------
 
 /** Environment variables and bindings bound to this Pages Function. */
-interface ContactEnv {
+export interface ContactEnv {
   readonly EMAIL?: SendEmail
   readonly CONTACT_DB?: D1Database
   readonly CONTACT_TO_EMAIL?: string
