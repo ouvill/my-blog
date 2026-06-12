@@ -19,6 +19,6 @@
     "isolatedModules": true,
     "jsx": "preserve"
   },
-  "include": ["src/**/*", "astro.config.mjs"],
+  "include": ["src/**/*", "functions/**/*", "astro.config.mjs"],
   "exclude": ["src/content/blog/**/src/**/*"]
 }

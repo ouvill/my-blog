@@ -11,6 +11,8 @@ export interface Props {
   isHome?: boolean
   /** The canonical URL for this page (used for SEO) */
   canonicalUrl?: string
+  /** If true, emit `<meta name="robots" content="noindex, nofollow" />` */
+  noindex?: boolean
 }
 
 const {
@@ -19,6 +21,7 @@ const {
   image,
   isHome = false,
   canonicalUrl,
+  noindex = false,
 } = Astro.props
 
 const pageTitle = `${title} | ${SITE_CONFIG.title}`
@@ -40,6 +43,7 @@ const pageTitle = `${title} | ${SITE_CONFIG.title}`
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={description} />
     {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <title>{pageTitle}</title>
     <link
       rel="icon"
@@ -60,7 +64,27 @@ const pageTitle = `${title} | ${SITE_CONFIG.title}`
   </body>
 </html>
 
-<style>
+<style is:global>
+  /* ---- CSS Custom Properties ---- */
+  :root {
+    --color-primary: #c2185b;
+    --color-primary-dark: #880e4f;
+    --color-primary-light: #fce4ec;
+    --color-link: #1976d2;
+    --color-link-hover: #0d47a1;
+    --color-text: #1a1a1a;
+    --color-text-secondary: #555;
+    --color-text-muted: #888;
+    --color-bg: #f7f7f7;
+    --color-surface: #ffffff;
+    --color-border: #e0e0e0;
+    --font-sans: "Hiragino Kaku Gothic ProN", "Hiragino Sans",
+      "Noto Sans CJK JP", "メイリオ", Meiryo, -apple-system,
+      BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: "SF Mono", "Fira Code", "Fira Mono", "Cascadia Code",
+      Consolas, "Noto Sans Mono", "Source Han Code JP", monospace;
+  }
+
   *,
   *::before,
   *::after {
@@ -74,29 +98,189 @@ const pageTitle = `${title} | ${SITE_CONFIG.title}`
 
   body {
     margin: 0;
-    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans CJK JP",
-      "メイリオ", Meiryo, sans-serif;
-    color: #333;
-    background-color: #f5f5f5;
+    font-family: var(--font-sans);
+    color: var(--color-text);
+    background-color: var(--color-bg);
     line-height: 1.7;
   }
 
   a {
-    transition: all 200ms ease;
-    color: #8bc34a;
+    transition: color 200ms ease;
+    color: var(--color-link);
     text-decoration: underline;
+    text-underline-offset: 2px;
   }
 
   a:hover {
-    color: #9ccc65;
-    opacity: 0.8;
+    color: var(--color-link-hover);
   }
 
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  hr {
+    margin: 2em 0;
+    border: none;
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* ---- Shared content typography (blog articles & static pages) ---- */
+
+  .blog-content,
+  .page-content {
+    line-height: 1.9;
+    font-size: 1.0625rem;
+  }
+
+  .blog-content h2,
+  .page-content h2,
+  .blog-content h3,
+  .page-content h3,
+  .blog-content h4,
+  .page-content h4 {
+    margin-top: 1.8em;
+    line-height: 1.5;
+  }
+
+  .blog-content h1,
+  .page-content h1 {
+    font-size: 1.75rem;
+    margin: 0 0 1em;
+    line-height: 1.4;
+  }
+
+  .blog-content h2,
+  .page-content h2 {
+    font-size: 1.45rem;
+    border-bottom: 2px solid var(--color-primary-light);
+    padding-bottom: 0.3em;
+  }
+
+  .blog-content h3,
+  .page-content h3 {
+    font-size: 1.25rem;
+  }
+
+  .blog-content h4,
+  .page-content h4 {
+    font-size: 1.1rem;
+  }
+
+  .blog-content p,
+  .page-content p {
+    margin: 1em 0;
+  }
+
+  .blog-content ul,
+  .page-content ul,
+  .blog-content ol,
+  .page-content ol {
+    margin: 0.8em 0;
+    padding-left: 1.5em;
+  }
+
+  .blog-content li,
+  .page-content li {
+    margin: 0.3em 0;
+    line-height: 1.7;
+  }
+
+  .blog-content blockquote,
+  .page-content blockquote {
+    margin: 1.5em 0;
+    padding: 0.5em 1em;
+    border-left: 4px solid var(--color-primary);
+    background: var(--color-primary-light);
+    color: var(--color-text-secondary);
+  }
+
+  .blog-content blockquote p,
+  .page-content blockquote p {
+    margin: 0.5em 0;
+  }
+
+  .blog-content pre,
+  .page-content pre {
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    padding: 1em 1.2em;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    border: 1px solid var(--color-border);
+  }
+
+  .blog-content code,
+  .page-content code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+  }
+
+  .blog-content :not(pre) > code,
+  .page-content :not(pre) > code {
+    background: #f0f0f0;
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    color: var(--color-primary);
+    word-break: break-all;
+  }
+
+  .blog-content img,
+  .page-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+  }
+
+  .blog-content table,
+  .page-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5em 0;
+    font-size: 0.9375rem;
+  }
+
+  .blog-content th,
+  .page-content th,
+  .blog-content td,
+  .page-content td {
+    border: 1px solid var(--color-border);
+    padding: 0.6em 0.8em;
+    text-align: left;
+  }
+
+  .blog-content th,
+  .page-content th {
+    background: #fafafa;
+    font-weight: 600;
+  }
+
+  .blog-content tbody tr:nth-child(even),
+  .page-content tbody tr:nth-child(even) {
+    background: #fafafa;
+  }
+
+  .blog-content a,
+  .page-content a {
+    color: var(--color-link);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .blog-content a:hover,
+  .page-content a:hover {
+    color: var(--color-link-hover);
+  }
+</style>
+
+<style>
   .root {
     position: relative;
     width: auto;
     min-height: 100vh;
-    background-color: #f5f5f5;
+    background-color: var(--color-bg);
   }
 
   .content {
@@ -107,8 +291,6 @@ const pageTitle = `${title} | ${SITE_CONFIG.title}`
 
   main {
     position: relative;
-    left: 0;
-    right: 0;
     z-index: 1;
     max-width: 960px;
     margin: 24px auto;

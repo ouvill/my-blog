@@ -26,3 +26,7 @@ src/
 └── pages/          # ルーティング
 public/             # 静的ファイル
 ```
+
+## デプロイ
+
+- **Cloudflare Pages** (primary): `wrangler.toml` の設定に従い自動デプロイ。詳細は [docs/cloudflare-pages.md](./docs/cloudflare-pages.md) を参照

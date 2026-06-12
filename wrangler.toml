@@ -1,0 +1,35 @@
+# Cloudflare Pages configuration
+# Docs: https://developers.cloudflare.com/pages/configuration/wrangler-configuration/
+#
+# Environment variables (CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL, NODE_VERSION)
+# are managed in the Cloudflare dashboard, not in this file.
+
+name = "ouvill-blog"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-06-12"
+
+# Cloudflare Email Service — Email Sending binding
+# Docs: https://developers.cloudflare.com/email-service/
+# Requires Workers Paid plan and Email Sending domain onboarding.
+[[send_email]]
+name = "EMAIL"
+
+# Cloudflare D1 — Contact form submissions database
+# Docs: https://developers.cloudflare.com/d1/
+#
+# Uncomment and fill in after creating the D1 database:
+#   wrangler d1 create ouvill-blog-contact
+#
+# Then apply the migration:
+#   wrangler d1 execute ouvill-blog-contact --remote \
+#     --file=./migrations/0001_create_contact_submissions.sql
+#
+# Replace <YOUR_D1_DATABASE_ID> with the database_id returned by `d1 create`.
+#
+# [[d1_databases]]
+# binding = "CONTACT_DB"
+# database_name = "ouvill-blog-contact"
+# database_id = "<YOUR_D1_DATABASE_ID>"
+#
+# NOTE: Until the D1 binding is configured, the contact form will return
+# `server_error` because submissions cannot be persisted.

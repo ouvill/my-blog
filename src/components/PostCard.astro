@@ -53,7 +53,7 @@ const hasCover = coverUrl !== DEFAULT_COVER
 
 <style>
   .post-card {
-    background: white;
+    background: var(--color-surface, #fff);
     border-radius: 12px;
     overflow: hidden;
     transition: transform 200ms ease, box-shadow 200ms ease;
@@ -63,8 +63,8 @@ const hasCover = coverUrl !== DEFAULT_COVER
   }
 
   .post-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
   }
 
   .post-card-link {
@@ -78,7 +78,7 @@ const hasCover = coverUrl !== DEFAULT_COVER
   .post-card-cover {
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    background: #fce4ec;
+    background: var(--color-primary-light, #fce4ec);
   }
 
   .cover-image {
@@ -102,24 +102,25 @@ const hasCover = coverUrl !== DEFAULT_COVER
 
   .post-date {
     font-size: 0.875rem;
-    color: #888;
+    color: var(--color-text-muted, #888);
   }
 
   .post-title {
     margin: 8px 0 0;
     font-size: 1.125rem;
     line-height: 1.5;
-    color: #333;
+    color: var(--color-text, #1a1a1a);
+    transition: color 200ms ease;
   }
 
   .post-card:hover .post-title {
-    color: #f48fb1;
+    color: var(--color-primary, #c2185b);
   }
 
   .post-description {
     margin: 8px 0 0;
     font-size: 0.875rem;
-    color: #666;
+    color: var(--color-text-secondary, #555);
     line-height: 1.6;
     flex: 1;
   }
@@ -132,10 +133,11 @@ const hasCover = coverUrl !== DEFAULT_COVER
   }
 
   .tag {
-    background: #fce4ec;
-    color: #f48fb1;
+    background: var(--color-primary-light, #fce4ec);
+    color: var(--color-primary, #c2185b);
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 0.75rem;
+    font-weight: 500;
   }
 </style>

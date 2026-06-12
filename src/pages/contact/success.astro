@@ -1,0 +1,53 @@
+---
+import BaseLayout from "@components/BaseLayout.astro"
+
+const title = "お問い合わせを受け付けました"
+---
+
+<BaseLayout title={title} noindex>
+  <div class="success-page">
+    <h1>お問い合わせを受け付けました</h1>
+    <p>お問い合わせいただきありがとうございます。</p>
+    <p>内容を確認の上、追ってご連絡いたします。</p>
+    <a href="/">トップページに戻る</a>
+  </div>
+</BaseLayout>
+
+<style>
+  .success-page {
+    text-align: center;
+    padding: 64px 16px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .success-page h1 {
+    font-size: 1.75rem;
+    margin: 0 0 20px;
+    color: var(--color-text, #1a1a1a);
+  }
+
+  .success-page p {
+    margin: 10px 0;
+    font-size: 1.0625rem;
+    color: var(--color-text-secondary, #555);
+    line-height: 1.7;
+  }
+
+  .success-page a {
+    display: inline-block;
+    margin-top: 28px;
+    padding: 10px 28px;
+    border: 1px solid var(--color-primary, #c2185b);
+    border-radius: 4px;
+    color: var(--color-primary, #c2185b);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 200ms ease;
+  }
+
+  .success-page a:hover {
+    background: var(--color-primary, #c2185b);
+    color: #fff;
+  }
+</style>

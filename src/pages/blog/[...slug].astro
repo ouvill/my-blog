@@ -192,7 +192,7 @@ const recentPosts = posts
   }
 
   .toc-wrap {
-    background: white;
+    background: var(--color-surface, #fff);
     border-radius: 4px;
     padding: 16px;
     position: sticky;
@@ -208,20 +208,26 @@ const recentPosts = posts
   }
 
   .toc-wrap a {
-    color: #8bc34a;
+    text-decoration: none;
+    color: var(--color-link, #1976d2);
+    font-size: 0.85rem;
   }
 
-  .toc-wrap ul {
+  .toc-wrap a:hover {
+    text-decoration: underline;
+  }
+
+  .toc-list {
     padding: 0;
     list-style: none;
   }
 
-  .toc-wrap ul ul {
+  .toc-list ul {
     padding-left: 16px;
   }
 
-  .toc-wrap li {
-    margin-top: 0.6em;
+  .toc-list li {
+    margin-top: 0.4em;
   }
 
   .blog-main {
@@ -230,12 +236,18 @@ const recentPosts = posts
   }
 
   .blog-paper {
-    background: white;
-    border-radius: 4px;
-    padding: 16px;
+    background: var(--color-surface, #fff);
+    border-radius: 8px;
+    padding: 24px 20px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     max-width: 760px;
     margin: 0 auto;
+  }
+
+  @media (min-width: 640px) {
+    .blog-paper {
+      padding: 32px;
+    }
   }
 
   .blog-title {
@@ -245,7 +257,7 @@ const recentPosts = posts
   }
 
   .blog-date {
-    color: #888;
+    color: var(--color-text-muted, #888);
     font-size: 0.9rem;
     margin: 0 0 12px;
   }
@@ -257,44 +269,19 @@ const recentPosts = posts
     margin-bottom: 16px;
   }
 
-  .tag {
-    background: #fce4ec;
-    color: #f48fb1;
+  .blog-tags .tag {
+    background: var(--color-primary-light, #fce4ec);
+    color: var(--color-primary, #c2185b);
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 0.75rem;
-  }
-
-  .blog-content {
-    line-height: 1.8;
-  }
-
-  .blog-content h2,
-  .blog-content h3,
-  .blog-content h4 {
-    margin-top: 1.5em;
-  }
-
-  .blog-content pre {
-    background-color: #fdf6e3;
-    border-radius: 0.3em;
-    padding: 1em;
-    overflow-x: auto;
-  }
-
-  .blog-content code {
-    font-family: "SF Mono", "Fira Code", "Fira Mono", monospace;
-  }
-
-  .blog-content img {
-    max-width: 100%;
-    height: auto;
+    font-weight: 500;
   }
 
   hr {
     margin: 24px 0;
     border: none;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--color-border, #e0e0e0);
   }
 
   .post-nav {
@@ -310,7 +297,7 @@ const recentPosts = posts
   .post-nav-link {
     max-width: 50%;
     text-decoration: none;
-    color: #8bc34a;
+    color: var(--color-link, #1976d2);
     font-size: 0.95rem;
   }
 
