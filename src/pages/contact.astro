@@ -23,7 +23,7 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
   server_error: {
     type: "error",
     heading: "送信処理で問題が発生しました",
-    body: "時間をおいて、もう一度送信してください。問題が続く場合はメールまたは Twitter DM でお問い合わせください。",
+    body: "時間をおいて、もう一度送信してください。問題が続く場合は Twitter DM でお問い合わせください。",
   },
 }
 
@@ -95,17 +95,11 @@ const currentMessage: StatusMessage | undefined = status
 
     <div class="contact-fallback">
       <p>
-        フォームがうまく動作しない場合は、以下のメールアドレスまで直接ご連絡ください。
-      </p>
-      <p class="email">
-        <a href="mailto:contact@ouvill.net">contact@ouvill.net</a>
-      </p>
-      <p>
-        または、<a
+        フォームがうまく動作しない場合は、時間をおいて再度お試しいただくか、<a
           href="https://twitter.com/Ouvill"
           target="_blank"
           rel="noopener noreferrer">Twitter</a
-        >のDMでも受け付けております。
+        >のDMでもお問い合わせください。
       </p>
     </div>
   </div>
@@ -256,24 +250,5 @@ const currentMessage: StatusMessage | undefined = status
   .contact-fallback p {
     margin: 0 0 8px;
     line-height: 1.7;
-  }
-
-  .email {
-    font-size: 1.125rem;
-    text-align: center;
-    padding: 12px;
-    margin: 12px 0;
-    background: var(--color-accent-soft);
-    border-radius: 10px;
-  }
-
-  .email a {
-    font-weight: 600;
-    color: var(--color-accent);
-    text-decoration: none;
-  }
-
-  .email a:hover {
-    text-decoration: underline;
   }
 </style>
