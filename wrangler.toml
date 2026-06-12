@@ -27,6 +27,10 @@ binding = "ASSETS"
 # unmatched routes (Astro generates dist/404.html from src/pages/404.astro).
 html_handling = "force-trailing-slash"
 not_found_handling = "404-page"
+# Browser form submissions send `Sec-Fetch-Mode: navigate`, which makes the
+# asset router treat the request as a page navigation and answer 405 before
+# the Worker runs. Route /api/* to the Worker unconditionally.
+run_worker_first = ["/api/*"]
 
 # Cloudflare Email Service — Email Sending binding
 # Docs: https://developers.cloudflare.com/email-service/
