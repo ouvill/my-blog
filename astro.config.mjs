@@ -14,9 +14,10 @@ export default defineConfig({
   // Markdown configuration
   markdown: {
     shikiConfig: {
-      theme: "solarized-light",
-      // Default languages
-      langs: [],
+      themes: {
+        light: "one-light",
+        dark: "one-dark-pro",
+      },
     },
   },
 })

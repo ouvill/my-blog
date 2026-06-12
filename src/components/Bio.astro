@@ -7,8 +7,8 @@ import { SITE_CONFIG } from "@lib/site"
     class="bio-avatar"
     src="/profile-pic.png"
     alt={SITE_CONFIG.author}
-    width="64"
-    height="64"
+    width="72"
+    height="72"
   />
   <div class="bio-text">
     <p>
@@ -28,26 +28,45 @@ import { SITE_CONFIG } from "@lib/site"
 <style>
   .bio {
     display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 16px 0;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px;
+    background: var(--color-accent-soft);
+    border-radius: 16px;
+    margin: 24px 0;
+  }
+
+  :global([data-theme="dark"]) .bio {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
   }
 
   .bio-avatar {
     border-radius: 50%;
-    min-width: 64px;
-    width: 64px;
-    height: 64px;
+    min-width: 72px;
+    width: 72px;
+    height: 72px;
     object-fit: cover;
+    border: 3px solid var(--color-surface);
+    flex-shrink: 0;
   }
 
   .bio-text p {
     margin: 0 0 8px;
     font-size: 0.9rem;
-    line-height: 1.6;
+    line-height: 1.7;
+    color: var(--color-text-secondary);
   }
 
   .bio-text p:last-child {
     margin-bottom: 0;
+  }
+
+  .bio-text a {
+    color: var(--color-accent);
+  }
+
+  .bio-text a:hover {
+    color: var(--color-accent-strong);
   }
 </style>

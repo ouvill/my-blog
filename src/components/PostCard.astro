@@ -12,8 +12,8 @@ const slug = blogEntryIdToSlug(post.id)
 const href = blogUrlPath(slug)
 const dateStr = post.data.date.toLocaleDateString("ja-JP", {
   year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
+  month: "long",
+  day: "numeric",
 })
 const visibleTags: string[] = post.data.tags?.slice(0, 4) ?? []
 const coverUrl = resolveCover(post)
@@ -22,49 +22,62 @@ const hasCover = coverUrl !== DEFAULT_COVER
 
 <article class="post-card">
   <a href={href} class="post-card-link">
-    {hasCover && (
-      <div class="post-card-cover">
-        <img
-          src={coverUrl}
-          alt=""
-          loading="lazy"
-          class="cover-image"
-        />
-      </div>
-    )}
+    {
+      hasCover ? (
+        <div class="post-card-cover">
+          <img src={coverUrl} alt="" loading="lazy" class="cover-image" />
+        </div>
+      ) : (
+        <div class="post-card-cover post-card-cover--placeholder">
+          <img
+            src="/cherry-blossom.svg"
+            alt=""
+            class="placeholder-icon"
+            width="64"
+            height="64"
+          />
+        </div>
+      )
+    }
     <div class="post-card-content">
       <time class="post-date" datetime={post.data.date.toISOString()}>
         {dateStr}
       </time>
       <h2 class="post-title">{post.data.title}</h2>
-      {post.data.description && (
-        <p class="post-description">{post.data.description}</p>
-      )}
-      {visibleTags.length > 0 && (
-        <div class="post-tags">
-          {visibleTags.map((tag) => (
-            <span class="tag">{tag}</span>
-          ))}
-        </div>
-      )}
+      {
+        post.data.description && (
+          <p class="post-description">{post.data.description}</p>
+        )
+      }
+      {
+        visibleTags.length > 0 && (
+          <div class="post-tags">
+            {visibleTags.map((tag) => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
+        )
+      }
     </div>
   </a>
 </article>
 
 <style>
   .post-card {
-    background: var(--color-surface, #fff);
-    border-radius: 12px;
+    background: var(--color-surface);
+    border-radius: 16px;
     overflow: hidden;
-    transition: transform 200ms ease, box-shadow 200ms ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition:
+      transform 250ms ease,
+      box-shadow 250ms ease;
+    box-shadow: var(--shadow-card);
     display: flex;
     flex-direction: column;
   }
 
   .post-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
   }
 
   .post-card-link {
@@ -78,7 +91,30 @@ const hasCover = coverUrl !== DEFAULT_COVER
   .post-card-cover {
     aspect-ratio: 16 / 9;
     overflow: hidden;
-    background: var(--color-primary-light, #fce4ec);
+    background: var(--color-accent-soft);
+  }
+
+  .post-card-cover--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(
+      135deg,
+      var(--color-accent-soft) 0%,
+      var(--color-bg) 100%
+    );
+  }
+
+  .placeholder-icon {
+    opacity: 0.35;
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    transition: transform 250ms ease;
+  }
+
+  .post-card:hover .placeholder-icon {
+    transform: scale(1.08);
   }
 
   .cover-image {
@@ -86,11 +122,11 @@ const hasCover = coverUrl !== DEFAULT_COVER
     height: 100%;
     object-fit: cover;
     display: block;
-    transition: transform 300ms ease;
+    transition: transform 250ms ease;
   }
 
   .post-card:hover .cover-image {
-    transform: scale(1.05);
+    transform: scale(1.04);
   }
 
   .post-card-content {
@@ -101,26 +137,29 @@ const hasCover = coverUrl !== DEFAULT_COVER
   }
 
   .post-date {
-    font-size: 0.875rem;
-    color: var(--color-text-muted, #888);
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
   }
 
   .post-title {
     margin: 8px 0 0;
     font-size: 1.125rem;
     line-height: 1.5;
-    color: var(--color-text, #1a1a1a);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-feature-settings: "palt";
+    color: var(--color-text);
     transition: color 200ms ease;
   }
 
   .post-card:hover .post-title {
-    color: var(--color-primary, #c2185b);
+    color: var(--color-accent);
   }
 
   .post-description {
     margin: 8px 0 0;
     font-size: 0.875rem;
-    color: var(--color-text-secondary, #555);
+    color: var(--color-text-secondary);
     line-height: 1.6;
     flex: 1;
   }
@@ -133,10 +172,10 @@ const hasCover = coverUrl !== DEFAULT_COVER
   }
 
   .tag {
-    background: var(--color-primary-light, #fce4ec);
-    color: var(--color-primary, #c2185b);
-    padding: 2px 8px;
-    border-radius: 4px;
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    padding: 2px 10px;
+    border-radius: 9999px;
     font-size: 0.75rem;
     font-weight: 500;
   }
