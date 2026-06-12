@@ -1,8 +1,6 @@
 ---
 import BaseLayout from "@components/BaseLayout.astro"
 
-const status = Astro.url.searchParams.get("status")
-
 interface StatusMessage {
   readonly type: "error" | "info"
   readonly heading: string
@@ -26,10 +24,6 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
     body: "時間をおいて、もう一度送信してください。問題が続く場合は Twitter DM でお問い合わせください。",
   },
 }
-
-const currentMessage: StatusMessage | undefined = status
-  ? STATUS_MESSAGES[status]
-  : undefined
 ---
 
 <BaseLayout title="お問い合わせ">
@@ -40,20 +34,22 @@ const currentMessage: StatusMessage | undefined = status
       ご依頼やご質問など、以下のフォームからお気軽にお送りください。
     </p>
 
+    {/* This page is statically prerendered, so the `?status=` query parameter
+        is only available in the browser. All messages are rendered hidden and
+        the matching one is revealed by the client-side script below. */}
     {
-      currentMessage && (
+      Object.entries(STATUS_MESSAGES).map(([key, message]) => (
         <div
-          class:list={[
-            "status-message",
-            { error: currentMessage.type === "error" },
-          ]}
+          class:list={["status-message", { error: message.type === "error" }]}
+          data-status={key}
           role="alert"
           aria-live="assertive"
+          hidden
         >
-          <p class="status-heading">{currentMessage.heading}</p>
-          <p class="status-body">{currentMessage.body}</p>
+          <p class="status-heading">{message.heading}</p>
+          <p class="status-body">{message.body}</p>
         </div>
-      )
+      ))
     }
 
     <form method="POST" action="/api/contact" class="contact-form">
@@ -104,6 +100,18 @@ const currentMessage: StatusMessage | undefined = status
     </div>
   </div>
 </BaseLayout>
+
+<script>
+  const status = new URLSearchParams(window.location.search).get("status")
+  if (status) {
+    const message = document.querySelector<HTMLElement>(
+      `.status-message[data-status="${CSS.escape(status)}"]`,
+    )
+    if (message) {
+      message.hidden = false
+    }
+  }
+</script>
 
 <style>
   .contact-page {
