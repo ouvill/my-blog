@@ -4,19 +4,19 @@
 
 - This is a Japanese-language technical blog (blog.ouvill.net) built on **Astro v5**.
 - Author GitHub: `Ouvill` / repo: `Ouvill/gatsbyjs_blog`.
-- Lockfile is **yarn.lock** only; no package-lock.json exists.
-- CI workflow (`.github/workflows/node.js.yml`) runs `yarn install --frozen-lockfile`, `yarn typecheck`, `yarn build` on push/PR to master with Node 22.
+- Lockfile is **package-lock.json** only; no yarn.lock exists.
+- CI workflow (`.github/workflows/node.js.yml`) runs `npm ci`, `npm run typecheck`, `npm run build` on push/PR to master with Node 22.
 
 ## Commands
 
 | Script | Command | Notes |
 |---|---|---|
-| `yarn dev` | `astro dev --host 0.0.0.0` | Dev server at `http://localhost:4321` |
-| `yarn build` | `astro build` | Production build → `dist/` |
-| `yarn preview` | `astro preview` | Preview production build locally |
-| `yarn typecheck` | `astro check` | Astro type checking (uses `@astrojs/check`) |
-| `yarn clean` | `rm -rf dist .astro` | Remove build and dev cache |
-| `yarn format` | `prettier --write 'src/**/*.{astro,ts,tsx,js,jsx}'` | Format with Prettier |
+| `npm run dev` | `astro dev --host 0.0.0.0` | Dev server at `http://localhost:4321` |
+| `npm run build` | `astro build` | Production build → `dist/` |
+| `npm run preview` | `astro preview` | Preview production build locally |
+| `npm run typecheck` | `astro check` | Astro type checking (uses `@astrojs/check`) |
+| `npm run clean` | `rm -rf dist .astro` | Remove build and dev cache |
+| `npm run format` | `prettier --write 'src/**/*.{astro,ts,tsx,js,jsx}'` | Format with Prettier |
 
 ## Project structure
 

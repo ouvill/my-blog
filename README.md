@@ -7,10 +7,10 @@ Astro ベースの静的サイトです。
 ## 開発
 
 ```bash
-yarn dev        # 開発サーバー起動 (http://localhost:4321)
-yarn build      # プロダクションビルド
-yarn preview    # ビルド結果のプレビュー
-yarn typecheck  # 型チェック
+npm run dev        # 開発サーバー起動 (http://localhost:4321)
+npm run build      # プロダクションビルド
+npm run preview    # ビルド結果のプレビュー
+npm run typecheck  # 型チェック
 ```
 
 ## プロジェクト構造
