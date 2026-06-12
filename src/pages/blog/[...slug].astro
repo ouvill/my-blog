@@ -3,7 +3,7 @@ import BaseLayout from "@components/BaseLayout.astro"
 import Bio from "@components/Bio.astro"
 import ShareLinks from "@components/ShareLinks.astro"
 import { getAllPosts } from "@lib/posts"
-import { entryIdToSlug, blogUrlPath } from "@lib/slug"
+import { blogEntryIdToSlug, blogUrlPath } from "@lib/slug"
 import { SITE_CONFIG } from "@lib/site"
 import { resolveCover } from "@lib/cover"
 import type { MarkdownHeading } from "astro"
@@ -15,7 +15,7 @@ export interface Params {
 export async function getStaticPaths() {
   const posts = await getAllPosts()
   return posts.map((post) => {
-    const slug = entryIdToSlug(post.id)
+    const slug = blogEntryIdToSlug(post.id)
     // Astro's [...slug] catch-all receives the full remainder as a single string,
     // so we pass the full slug directly (e.g., "foo" or "foo/bar").
     return {
@@ -30,7 +30,7 @@ const fullSlug = slug ?? ""
 
 // Find the post by slug
 const posts = await getAllPosts()
-const post = posts.find((p) => entryIdToSlug(p.id) === fullSlug)
+const post = posts.find((p) => blogEntryIdToSlug(p.id) === fullSlug)
 
 if (!post) {
   return Astro.redirect("/404", 404)
@@ -55,14 +55,14 @@ const allTags = [
 ]
 
 // Previous/next posts
-const currentIndex = posts.findIndex((p) => entryIdToSlug(p.id) === fullSlug)
+const currentIndex = posts.findIndex((p) => blogEntryIdToSlug(p.id) === fullSlug)
 const prevPost =
   currentIndex < posts.length - 1 ? posts[currentIndex + 1] : null
 const nextPost = currentIndex > 0 ? posts[currentIndex - 1] : null
 
 // Recent posts (3 latest, excluding current)
 const recentPosts = posts
-  .filter((p) => entryIdToSlug(p.id) !== fullSlug)
+  .filter((p) => blogEntryIdToSlug(p.id) !== fullSlug)
   .slice(0, 3)
 ---
 
@@ -117,7 +117,7 @@ const recentPosts = posts
         <nav class="post-nav">
           {nextPost && (
             <a
-              href={blogUrlPath(entryIdToSlug(nextPost.id))}
+              href={blogUrlPath(blogEntryIdToSlug(nextPost.id))}
               rel="next"
               class="post-nav-link prev"
             >
@@ -126,7 +126,7 @@ const recentPosts = posts
           )}
           {prevPost && (
             <a
-              href={blogUrlPath(entryIdToSlug(prevPost.id))}
+              href={blogUrlPath(blogEntryIdToSlug(prevPost.id))}
               rel="prev"
               class="post-nav-link next"
             >
@@ -141,7 +141,7 @@ const recentPosts = posts
             <ul>
               {recentPosts.map((rp) => (
                 <li>
-                  <a href={blogUrlPath(entryIdToSlug(rp.id))}>
+                  <a href={blogUrlPath(blogEntryIdToSlug(rp.id))}>
                     {rp.data.title}
                   </a>
                 </li>

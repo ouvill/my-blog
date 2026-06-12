@@ -1,6 +1,6 @@
 import { getCollection } from "astro:content"
 import type { CollectionEntry } from "astro:content"
-import { entryIdToSlug } from "./slug"
+import { blogEntryIdToSlug } from "./slug"
 
 export type BlogPost = CollectionEntry<"blog">
 
@@ -24,7 +24,7 @@ export async function getPostBySlug(
   slug: string,
 ): Promise<BlogPost | undefined> {
   const posts = await getAllPosts()
-  return posts.find((p) => entryIdToSlug(p.id) === slug)
+  return posts.find((p) => blogEntryIdToSlug(p.id) === slug)
 }
 
 /**

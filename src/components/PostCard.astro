@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content"
-import { entryIdToSlug, blogUrlPath } from "@lib/slug"
+import { blogEntryIdToSlug, blogUrlPath } from "@lib/slug"
 import { resolveCover, DEFAULT_COVER } from "@lib/cover"
 
 export interface Props {
@@ -8,7 +8,7 @@ export interface Props {
 }
 
 const { post } = Astro.props
-const slug = entryIdToSlug(post.id)
+const slug = blogEntryIdToSlug(post.id)
 const href = blogUrlPath(slug)
 const dateStr = post.data.date.toLocaleDateString("ja-JP", {
   year: "numeric",
