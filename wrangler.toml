@@ -16,9 +16,9 @@ main = "src/worker.ts"
 # Uncomment when switching the production domain to this Worker:
 # Docs: https://developers.cloudflare.com/workers/configuration/routing/custom-domains/
 #
-# [[routes]]
-# pattern = "blog.ouvill.net"
-# custom_domain = true
+[[routes]]
+pattern = "blog.ouvill.net"
+custom_domain = true
 
 [assets]
 directory = "./dist"
