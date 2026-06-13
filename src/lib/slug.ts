@@ -1,8 +1,8 @@
 /**
  * Compute a URL slug from a content entry ID, mirroring Gatsby's createFilePath.
  *
- * In Astro content collections `type: "content"`, the entry `id` is the path
- * relative to the collection directory, including the `.md` extension.
+ * In Astro content collections using `glob()` loaders, the entry `id` is the
+ * path relative to the base directory, including the `.md` extension.
  *
  * - `"dir/index.md"`  → `"dir"`       (index.md files)
  * - `"dir/file.md"`   → `"dir/file"`  (non-index .md files)

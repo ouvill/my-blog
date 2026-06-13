@@ -1,4 +1,6 @@
-import { z, defineCollection } from "astro:content"
+import { defineCollection } from "astro:content"
+import { z } from "astro/zod"
+import { glob } from "astro/loaders"
 
 /**
  * Normalize a date-like value to a Date object.
@@ -18,7 +20,7 @@ function normalizeDate(input: unknown): Date {
 }
 
 const blogCollection = defineCollection({
-  type: "content",
+  loader: glob({ pattern: "**/*.md", base: "./src/content/blog" }),
   schema: z.object({
     // Required fields
     title: z.string(),
@@ -42,7 +44,7 @@ const blogCollection = defineCollection({
 })
 
 const pagesCollection = defineCollection({
-  type: "content",
+  loader: glob({ pattern: "**/*.md", base: "./src/content/pages" }),
   schema: z.object({
     title: z.string(),
     date: z.coerce.date().optional(),

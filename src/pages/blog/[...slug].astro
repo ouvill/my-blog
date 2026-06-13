@@ -7,6 +7,7 @@ import { blogEntryIdToSlug, blogUrlPath } from "@lib/slug"
 import { SITE_CONFIG } from "@lib/site"
 import { resolveCover } from "@lib/cover"
 import type { MarkdownHeading } from "astro"
+import { render } from "astro:content"
 
 export interface Params {
   slug: string
@@ -36,7 +37,7 @@ if (!post) {
   return Astro.redirect("/404", 404)
 }
 
-const { Content, headings } = await post.render()
+const { Content, headings } = await render(post)
 
 const canonicalUrl = `${SITE_CONFIG.url}${blogUrlPath(fullSlug)}`
 const coverUrl = resolveCover(post)
