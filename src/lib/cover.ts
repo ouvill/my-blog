@@ -38,18 +38,21 @@ function getPostDir(entryId: string): string {
 const FALLBACK_COVERS = ["thumb.jpg", "cover.jpg", "cover.png"]
 
 /**
- * Resolve the frontmatter `cover` string to a built asset URL string.
+ * Resolve the frontmatter `cover` to a built asset URL string, or return
+ * `null` if no real cover image is found (i.e. this post has no cover).
  *
  * The algorithm:
  * 1. If `cover` is empty/null/undefined, skip to fallbacks.
  * 2. Otherwise resolve the relative cover path against the post's directory
  *    and look it up in the `import.meta.glob` result.
  * 3. If not found in glob, also try fallback filenames (thumb.jpg, etc.).
- * 4. If nothing matches, return the default cover URL.
+ * 4. If nothing matches, return null.
  *
- * @returns An absolute URL path (e.g., "/_astro/cover.hash.png" or "/site-header.jpg").
+ * @returns An absolute URL path (e.g., "/_astro/cover.hash.png") or null.
  */
-export function resolveCover(post: CollectionEntry<"blog">): string {
+export function resolveCoverOrNull(
+  post: CollectionEntry<"blog">,
+): string | null {
   const postDir = getPostDir(post.id)
   const rawCover = post.data.cover
 
@@ -75,6 +78,14 @@ export function resolveCover(post: CollectionEntry<"blog">): string {
     }
   }
 
-  // Ultimate fallback
-  return DEFAULT_COVER
+  return null
+}
+
+/**
+ * Resolve the frontmatter `cover` string to a built asset URL string.
+ *
+ * @returns An absolute URL path (e.g., "/_astro/cover.hash.png" or "/site-header.jpg").
+ */
+export function resolveCover(post: CollectionEntry<"blog">): string {
+  return resolveCoverOrNull(post) ?? DEFAULT_COVER
 }
