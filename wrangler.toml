@@ -1,0 +1,51 @@
+# Cloudflare Workers configuration
+# Docs: https://developers.cloudflare.com/workers/
+#
+# CONTACT_TO_EMAIL / CONTACT_FROM_EMAIL are Worker secrets, set via:
+#   wrangler secret put CONTACT_TO_EMAIL
+#   wrangler secret put CONTACT_FROM_EMAIL
+# Secrets survive `wrangler deploy`. Do NOT set them as plain-text variables
+# in the dashboard — those are deleted on every `wrangler deploy` because
+# this file does not declare them (and `keep_vars` is not enabled).
+
+name = "ouvill-blog"
+compatibility_date = "2026-06-12"
+main = "src/worker.ts"
+
+# Custom domain — blog.ouvill.net is still served by Netlify.
+# Uncomment when switching the production domain to this Worker:
+# Docs: https://developers.cloudflare.com/workers/configuration/routing/custom-domains/
+#
+[[routes]]
+pattern = "blog.ouvill.net"
+custom_domain = true
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+# Match Astro's `trailingSlash: "always"` behaviour and serve 404.html for
+# unmatched routes (Astro generates dist/404.html from src/pages/404.astro).
+html_handling = "force-trailing-slash"
+not_found_handling = "404-page"
+# Browser form submissions send `Sec-Fetch-Mode: navigate`, which makes the
+# asset router treat the request as a page navigation and answer 405 before
+# the Worker runs. Route /api/* to the Worker unconditionally.
+run_worker_first = ["/api/*"]
+
+# Cloudflare Email Service — Email Sending binding
+# Docs: https://developers.cloudflare.com/email-service/
+# Requires Workers Paid plan and Email Sending domain onboarding.
+[[send_email]]
+name = "EMAIL"
+
+# Cloudflare D1 — Contact form submissions database
+# Docs: https://developers.cloudflare.com/d1/
+#
+# The migration (migrations/0001_create_contact_submissions.sql) has been
+# applied to the remote database. To re-apply on a fresh database:
+#   wrangler d1 execute ouvill-blog-contact-prod --remote \
+#     --file=./migrations/0001_create_contact_submissions.sql
+[[d1_databases]]
+binding = "CONTACT_DB"
+database_name = "ouvill-blog-contact-prod"
+database_id = "6ffa8f11-d0bf-47c1-ac74-8965c974b770"

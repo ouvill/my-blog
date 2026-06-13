@@ -1,0 +1,100 @@
+# Cloudflare Pages _redirects
+# Docs: https://developers.cloudflare.com/pages/configuration/redirects/
+#
+# Note: Cloudflare Pages does NOT support the Netlify "!" (force redirect)
+# suffix. All status codes below are plain 301 redirects. Because the source
+# paths do not correspond to real files, this is behaviorally equivalent.
+
+# Blog Post Redirect — from old VuePress URLs directly to final current blog URLs
+/posts/2019/01/28/discord-rss.html /blog/2019-01-28--discord_rss/discord_rss/ 301
+/posts/2019/01/11/set-cmd-chemes.html /blog/2019-01-11--set_cmd_chemes/set_cmd_chemes/ 301
+/posts/2019/03/30/make-vuepress-blog.html /blog/2019-03-30--vuepress_blog/make_vuepress_blog/ 301
+/posts/2018/12/04/tutanota.html /blog/2018-12-04--tutanota/tutanota/ 301
+/posts/2019/04/15/webpack-scss.html /blog/2019-04-15--webpack-scss/webpack-scss/ 301
+/posts/2019/04/17/webpack-sass-typescript.html /blog/2019-04-17--webpack-sass-typescript/webpack-sass-typescript/ 301
+/posts/2019/06/14/cant-install-npm-sharp.html /blog/2019-06-14--npm-sharp/cant-install-npm-sharp/ 301
+/posts/2019/04/29/nextjs-with-typescript.html /blog/2019-04-29--nextjs-with-typescript/nextjs-with-typescript/ 301
+/posts/2018/11/30/typora.html /blog/2018-11-30--typora/typora/ 301
+/posts/2019/05/18/svg-object-move.html /blog/2019-05-18--svg-object-move/svg-object-move/ 301
+/posts/2019/03/29/change-blog-system.html /blog/2019-03-29--change_blog_system/change_blog_system/ 301
+/posts/2019/04/14/start-react-with-typescript.html /blog/2019-04-14--start-react-with-typescript/start-react-with-typescript/ 301
+
+# /posts/:year/:month/:day/:slug /blog/:year-:month-:day--:slug/:slug
+
+# Blog Post Redirect — from old duplicated Markdown file URLs to canonical index.md URLs
+/blog/2023-01-10-connect_usb_to_wsl/wsl%E3%81%A7USB%E6%8E%A5%E7%B6%9A/ /blog/2023-01-10--connect_usb_to_wsl/ 301
+/blog/2023-01-16-reboot-microk8s-node/microk8s%E3%81%AE%E3%83%8E%E3%83%BC%E3%83%89%E3%82%92%E5%86%8D%E8%B5%B7%E5%8B%95%E3%81%99%E3%82%8B/ /blog/2023-01-16--reboot-microk8s-node/ 301
+/blog/2023-01-26-build_docker_multi_architecture_with_github_action/GitHub_Action%E3%81%A7ARM64%E3%81%A8AMD64%E3%81%AEDocker%E3%82%A4%E3%83%A1%E3%83%BC%E3%82%B8%E3%82%92%E3%83%93%E3%83%AB%E3%83%89%E3%81%99%E3%82%8B/ /blog/2023-01-26--build_docker_multi_architecture_with_github_action/ 301
+
+# Legacy single-hyphen slug redirects — redirect old single-dash URLs to new double-dash canonical URLs
+/blog/2018-03-10-agreement_github_personal/agreement_github_personal/ /blog/2018-03-10--agreement_github_personal/agreement_github_personal/ 301
+/blog/2018-03-11-simplenote_shortcut/ /blog/2018-03-11--simplenote_shortcut/ 301
+/blog/2018-03-11-use_google_domains/use_google_domains/ /blog/2018-03-11--use_google_domains/use_google_domains/ 301
+/blog/2018-05-19-hiyokonitsuduke/hiyokonitsuduke/ /blog/2018-05-19--hiyokonitsuduke/hiyokonitsuduke/ 301
+/blog/2018-05-19-myskill/myskill/ /blog/2018-05-19--myskill/myskill/ 301
+/blog/2018-05-20-dont_alone/dont_alone/ /blog/2018-05-20--dont_alone/dont_alone/ 301
+/blog/2018-05-22-jsonkeytolowercamel/-jsonkeytolowercamel/ /blog/2018-05-22--jsonkeytolowercamel/-jsonkeytolowercamel/ 301
+/blog/2018-10-23-lets_signal/lets_signal/ /blog/2018-10-23--lets_signal/lets_signal/ 301
+/blog/2018-11-23-discord-slack/discord-slack/ /blog/2018-11-23--discord-slack/discord-slack/ 301
+/blog/2018-11-23-start-blog/start-blog/ /blog/2018-11-23--start-blog/start-blog/ 301
+/blog/2018-11-27-gitlab_gitbook/gitlab_gitbook/ /blog/2018-11-27--gitlab_gitbook/gitlab_gitbook/ 301
+/blog/2018-11-28-speed_up/speed_up/ /blog/2018-11-28--speed_up/speed_up/ 301
+/blog/2018-11-29-disable_fb_comment/disable_fb_comment/ /blog/2018-11-29--disable_fb_comment/disable_fb_comment/ 301
+/blog/2018-11-30-typora/typora/ /blog/2018-11-30--typora/typora/ 301
+/blog/2018-12-02-vuepress/vuepress/ /blog/2018-12-02--vuepress/vuepress/ 301
+/blog/2018-12-03-tls_mail/tls_mail/ /blog/2018-12-03--tls_mail/tls_mail/ 301
+/blog/2018-12-04-tutanota/tutanota/ /blog/2018-12-04--tutanota/tutanota/ 301
+/blog/2019-01-11-set_cmd_chemes/set_cmd_chemes/ /blog/2019-01-11--set_cmd_chemes/set_cmd_chemes/ 301
+/blog/2019-01-28-discord_rss/discord_rss/ /blog/2019-01-28--discord_rss/discord_rss/ 301
+/blog/2019-01-29-firefox_send_tresorit_send/firefox_send_tresorit_send/ /blog/2019-01-29--firefox_send_tresorit_send/firefox_send_tresorit_send/ 301
+/blog/2019-03-04-complain_blog_system/complain_blog_system/ /blog/2019-03-04--complain_blog_system/complain_blog_system/ 301
+/blog/2019-03-29-change_blog_system/change_blog_system/ /blog/2019-03-29--change_blog_system/change_blog_system/ 301
+/blog/2019-03-30-vuepress_blog/make_vuepress_blog/ /blog/2019-03-30--vuepress_blog/make_vuepress_blog/ 301
+/blog/2019-04-02-tree_command/tree_command/ /blog/2019-04-02--tree_command/tree_command/ 301
+/blog/2019-04-04-yubikey_guide/yubikey_guide/ /blog/2019-04-04--yubikey_guide/yubikey_guide/ 301
+/blog/2019-04-10-microk8s-install-error-utils/microk8s-install-error-utils/ /blog/2019-04-10--microk8s-install-error-utils/microk8s-install-error-utils/ 301
+/blog/2019-04-14-start-react-with-typescript/start-react-with-typescript/ /blog/2019-04-14--start-react-with-typescript/start-react-with-typescript/ 301
+/blog/2019-04-14-learn-typescript/learn-typescript/ /blog/2019-04-14--learn-typescript/learn-typescript/ 301
+/blog/2019-04-15-create-webpack-environment/create-webpack-environment/ /blog/2019-04-15--create-webpack-environment/create-webpack-environment/ 301
+/blog/2019-04-15-learn-webpack/learn-webpack/ /blog/2019-04-15--learn-webpack/learn-webpack/ 301
+/blog/2019-04-15-learn-sass/learn-sass/ /blog/2019-04-15--learn-sass/learn-sass/ 301
+/blog/2019-04-15-webpack-scss/webpack-scss/ /blog/2019-04-15--webpack-scss/webpack-scss/ 301
+/blog/2019-04-16-learn-react/learn-react/ /blog/2019-04-16--learn-react/learn-react/ 301
+/blog/2019-04-17-webpack-sass-typescript/webpack-sass-typescript/ /blog/2019-04-17--webpack-sass-typescript/webpack-sass-typescript/ 301
+/blog/2019-04-17-web-design-practice-1/web-design-practice-1/ /blog/2019-04-17--web-design-practice-1/web-design-practice-1/ 301
+/blog/2019-04-19-apple-store-google-store-link/apple-store-google-store-link/ /blog/2019-04-19--apple-store-google-store-link/apple-store-google-store-link/ 301
+/blog/2019-04-29-nextjs-with-typescript/nextjs-with-typescript/ /blog/2019-04-29--nextjs-with-typescript/nextjs-with-typescript/ 301
+/blog/2019-05-15-kazam-screencaster/kazam-screencaster/ /blog/2019-05-15--kazam-screencaster/kazam-screencaster/ 301
+/blog/2019-05-18-svg-object-move/svg-object-move/ /blog/2019-05-18--svg-object-move/svg-object-move/ 301
+/blog/2019-06-06-ubuntu-19-04/ubuntu-19-04/ /blog/2019-06-06--ubuntu-19-04/ubuntu-19-04/ 301
+/blog/2019-06-14-npm-sharp/cant-install-npm-sharp/ /blog/2019-06-14--npm-sharp/cant-install-npm-sharp/ 301
+/blog/2019-06-17-gatsbyjs-react-pose/gatsbyjs-react-pose/ /blog/2019-06-17--gatsbyjs-react-pose/gatsbyjs-react-pose/ 301
+/blog/2019-06-28-change_blog_vewpress_to_gatsbyjs/ /blog/2019-06-28--change_blog_vewpress_to_gatsbyjs/ 301
+/blog/2020-01-06-start-php/ /blog/2020-01-06--start-php/ 301
+/blog/2020-01-07-start-php2/ /blog/2020-01-07--start-php2/ 301
+/blog/2020-01-07-start-php3/ /blog/2020-01-07--start-php3/ 301
+/blog/2020-01-08-Kubernetes-start/ /blog/2020-01-08--Kubernetes-start/ 301
+/blog/2020-01-08-start-php4/ /blog/2020-01-08--start-php4/ 301
+/blog/2020-02-04-ubuntu-switch-window/ /blog/2020-02-04--ubuntu-switch-window/ 301
+/blog/2020-02-05-change-japanese-shortcut/ /blog/2020-02-05--change-japanese-shortcut/ 301
+/blog/2020-02-11-design-tools/ /blog/2020-02-11--design-tools/ 301
+/blog/2021-04-02-use-yubikey-on-wsl/ /blog/2021-04-02--use-yubikey-on-wsl/ 301
+/blog/2021-04-04-kubernetes--ingress/ /blog/2021-04-04--kubernetes--ingress/ 301
+/blog/2021-06-13-rename-lvm-volume/ /blog/2021-06-13--rename-lvm-volume/ 301
+/blog/2021-06-15-flutter-linux-build/ /blog/2021-06-15--flutter-linux-build/ 301
+/blog/2021-12-22-change-keyboard-swicth-Boba-U4/ /blog/2021-12-22--change-keyboard-swicth-Boba-U4/ 301
+/blog/2022-05-11-create_microk8s_cluster_on_raspberry_pi/ /blog/2022-05-11--create_microk8s_cluster_on_raspberry_pi/ 301
+/blog/2022-05-20-react-native-webview/ /blog/2022-05-20--react-native-webview/ 301
+/blog/2022-07-04-study-for-riss/ /blog/2022-07-04--study-for-riss/ 301
+/blog/2022-10-13-category-variable/ /blog/2022-10-13--category-variable/ 301
+/blog/2022-10-18-change_windows_11_taskbar_position/ /blog/2022-10-18--change_windows_11_taskbar_position/ 301
+/blog/2022-12-20-jetbrains_devcontainer/ /blog/2022-12-20--jetbrains_devcontainer/ 301
+
+# Additional single-hyphen slug redirects — redirect old single-dash URLs to new double-dash canonical URLs
+/blog/2023-01-10-connect_usb_to_wsl/ /blog/2023-01-10--connect_usb_to_wsl/ 301
+/blog/2023-01-16-reboot-microk8s-node/ /blog/2023-01-16--reboot-microk8s-node/ 301
+/blog/2023-01-26-build_docker_multi_architecture_with_github_action/ /blog/2023-01-26--build_docker_multi_architecture_with_github_action/ 301
+/blog/2024-08-19-create_tyranoscript_plugin/ /blog/2024-08-19--create_tyranoscript_plugin/ 301
+/blog/2024-09-04-2024_programming_language/ /blog/2024-09-04--2024_programming_language/ 301
+/blog/2024-09-06-git-install/ /blog/2024-09-06--git-install/ 301
+/blog/2025-08-19-make_firefox_use_dolphin/ /blog/2025-08-19--make_firefox_use_dolphin/ 301

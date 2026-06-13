@@ -1,0 +1,79 @@
+---
+import BaseLayout from "@components/BaseLayout.astro"
+
+const title = "ページが見つかりません"
+---
+
+<BaseLayout title={title}>
+  <div class="not-found">
+    <img
+      src="/cherry-blossom.svg"
+      alt=""
+      width="72"
+      height="72"
+      class="not-found-icon"
+    />
+    <h1 class="not-found-code">404</h1>
+    <p class="not-found-message">お探しのページは見つかりませんでした。</p>
+    <p class="not-found-hint">
+      URLが変更されたか、削除された可能性があります。
+    </p>
+    <a href="/" class="home-link">トップページに戻る</a>
+  </div>
+</BaseLayout>
+
+<style>
+  .not-found {
+    text-align: center;
+    padding: 64px 16px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .not-found-icon {
+    display: block;
+    margin: 0 auto 16px;
+    opacity: 0.55;
+  }
+
+  .not-found-code {
+    font-size: 4.5rem;
+    margin: 0 0 8px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--color-accent);
+    line-height: 1;
+  }
+
+  .not-found-message {
+    margin: 0 0 8px;
+    font-size: 1.125rem;
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .not-found-hint {
+    margin: 0 0 32px;
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+
+  .home-link {
+    display: inline-block;
+    padding: 10px 32px;
+    border: 1.5px solid var(--color-accent);
+    border-radius: 9999px;
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 600;
+    transition:
+      background 200ms ease,
+      color 200ms ease;
+  }
+
+  .home-link:hover {
+    background: var(--color-accent);
+    color: #fff;
+  }
+</style>

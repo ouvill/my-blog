@@ -1,0 +1,51 @@
+# Purpose: validates the Astro blog app when PRs or pushes target app repo master.
+# Required branch/config: app repo default branch is currently master; update branches if renamed.
+# Required submodule: src/content/blog must be available as a git submodule; checkout uses submodules: recursive.
+# Required environment: Node.js 22, package-lock.json/npm ci.
+# Cloudflare note: this workflow does not deploy; Cloudflare Git integration deploys after master updates.
+# Required secrets: SUBMODULE_UPDATE_TOKEN.
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      SUBMODULE_UPDATE_TOKEN: ${{ secrets.SUBMODULE_UPDATE_TOKEN }}
+
+    steps:
+      - name: Validate SUBMODULE_UPDATE_TOKEN
+        run: |
+          if [ -z "$SUBMODULE_UPDATE_TOKEN" ]; then
+            echo "::error::SUBMODULE_UPDATE_TOKEN secret is not set or is empty. This secret is required for private submodule checkout."
+            exit 1
+          fi
+          echo "SUBMODULE_UPDATE_TOKEN is configured."
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULE_UPDATE_TOKEN }}
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build

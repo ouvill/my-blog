@@ -1,0 +1,577 @@
+---
+import BaseLayout from "@components/BaseLayout.astro"
+import Bio from "@components/Bio.astro"
+import ShareLinks from "@components/ShareLinks.astro"
+import { getAllPosts } from "@lib/posts"
+import { blogEntryIdToSlug, blogUrlPath } from "@lib/slug"
+import { SITE_CONFIG } from "@lib/site"
+import { resolveCover } from "@lib/cover"
+import type { MarkdownHeading } from "astro"
+
+export interface Params {
+  slug: string
+}
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts()
+  return posts.map((post) => {
+    const slug = blogEntryIdToSlug(post.id)
+    // Astro's [...slug] catch-all receives the full remainder as a single string,
+    // so we pass the full slug directly (e.g., "foo" or "foo/bar").
+    return {
+      params: { slug },
+    }
+  })
+}
+
+const { slug } = Astro.params
+// Astro's [...slug] passes the full remainder as a single string; default to empty
+const fullSlug = slug ?? ""
+
+// Find the post by slug
+const posts = await getAllPosts()
+const post = posts.find((p) => blogEntryIdToSlug(p.id) === fullSlug)
+
+if (!post) {
+  return Astro.redirect("/404", 404)
+}
+
+const { Content, headings } = await post.render()
+
+const canonicalUrl = `${SITE_CONFIG.url}${blogUrlPath(fullSlug)}`
+const coverUrl = resolveCover(post)
+const ogImage = `${SITE_CONFIG.url}${coverUrl}`
+
+const dateStr = post.data.date.toLocaleDateString("ja-JP", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+})
+
+// Collect unified tags (support both `tags` and legacy `tag` fields)
+const allTags = [...(post.data.tags ?? []), ...(post.data.tag ?? [])]
+
+// Previous/next posts
+const currentIndex = posts.findIndex((p) => blogEntryIdToSlug(p.id) === fullSlug)
+const prevPost = currentIndex < posts.length - 1 ? posts[currentIndex + 1] : null
+const nextPost = currentIndex > 0 ? posts[currentIndex - 1] : null
+
+// Recent posts (3 latest, excluding current)
+const recentPosts = posts
+  .filter((p) => blogEntryIdToSlug(p.id) !== fullSlug)
+  .slice(0, 3)
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description ?? undefined}
+  image={ogImage}
+  canonicalUrl={canonicalUrl}
+>
+  <div class="blog-layout">
+    <article class="blog-main">
+      <div class="blog-paper">
+        <header class="blog-header">
+          <time class="blog-date" datetime={post.data.date.toISOString()}>
+            {dateStr}
+          </time>
+          {
+            allTags.length > 0 && (
+              <div class="blog-tags">
+                {allTags.map((tag) => (
+                  <span class="tag">{tag}</span>
+                ))}
+              </div>
+            )
+          }
+          <h1 class="blog-title">{post.data.title}</h1>
+        </header>
+
+        {
+          headings.length > 0 && (
+            <nav class="toc-inline" aria-label="目次">
+              <p class="toc-title">目次</p>
+              <ul class="toc-list">
+                {headings
+                  .filter(
+                    (h: MarkdownHeading) => h.depth >= 2 && h.depth <= 3,
+                  )
+                  .map((h: MarkdownHeading) => (
+                    <li style={`padding-left: ${(h.depth - 2) * 16}px`}>
+                      <a href={`#${h.slug}`}>{h.text}</a>
+                    </li>
+                  ))}
+              </ul>
+            </nav>
+          )
+        }
+
+        <div class="blog-content">
+          <Content />
+        </div>
+
+        <hr />
+
+        <ShareLinks
+          url={canonicalUrl}
+          title={`${post.data.title} | ${SITE_CONFIG.title}`}
+        />
+
+        <Bio />
+
+        <nav class="post-nav" aria-label="前後の記事">
+          {
+            nextPost && (
+              <a
+                href={blogUrlPath(blogEntryIdToSlug(nextPost.id))}
+                rel="next"
+                class="post-nav-card"
+              >
+                <span class="post-nav-label">← 前の記事</span>
+                <span class="post-nav-title">{nextPost.data.title}</span>
+              </a>
+            )
+          }
+          {
+            prevPost && (
+              <a
+                href={blogUrlPath(blogEntryIdToSlug(prevPost.id))}
+                rel="prev"
+                class="post-nav-card post-nav-card--next"
+              >
+                <span class="post-nav-label">次の記事 →</span>
+                <span class="post-nav-title">{prevPost.data.title}</span>
+              </a>
+            )
+          }
+        </nav>
+
+        {
+          recentPosts.length > 0 && (
+            <section class="recent-posts">
+              <h3 class="recent-title">最新記事</h3>
+              <ul class="recent-list">
+                {recentPosts.map((rp) => (
+                  <li class="recent-item">
+                    <a href={blogUrlPath(blogEntryIdToSlug(rp.id))}>
+                      {rp.data.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+      </div>
+    </article>
+
+    <aside class="sidebar-toc" aria-label="目次">
+      {
+        headings.length > 0 && (
+          <div class="toc-card">
+            <p class="toc-card-title">目次</p>
+            <ul class="toc-card-list">
+              {headings
+                .filter(
+                  (h: MarkdownHeading) => h.depth >= 2 && h.depth <= 3,
+                )
+                .map((h: MarkdownHeading) => (
+                  <li style={`padding-left: ${(h.depth - 2) * 16}px`}>
+                    <a href={`#${h.slug}`}>{h.text}</a>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        )
+      }
+    </aside>
+  </div>
+</BaseLayout>
+
+<script>
+  function initTocScrollSpy() {
+    const sidebar = document.querySelector<HTMLElement>(".sidebar-toc")
+    if (!sidebar) return
+
+    const tocLinks = Array.from(
+      sidebar.querySelectorAll<HTMLAnchorElement>(".toc-card-list a[href^='#']"),
+    )
+    if (tocLinks.length === 0) return
+
+    const content = document.querySelector<HTMLElement>(".blog-content")
+    if (!content) return
+
+    const headings = Array.from(
+      content.querySelectorAll<HTMLHeadingElement>("h2, h3"),
+    )
+    if (headings.length === 0) return
+
+    let activeId: string | null = null
+
+    function setActive(id: string | null) {
+      if (id === activeId) return
+      activeId = id
+      tocLinks.forEach((link) => {
+        const matches = id !== null && link.getAttribute("href") === `#${id}`
+        link.classList.toggle("toc-active", matches)
+      })
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Find the topmost heading that is currently intersecting
+        let topEntry: IntersectionObserverEntry | null = null
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            if (
+              topEntry === null ||
+              entry.boundingClientRect.top <
+                topEntry.boundingClientRect.top
+            ) {
+              topEntry = entry
+            }
+          }
+        })
+
+        if (topEntry !== null) {
+          setActive((topEntry as IntersectionObserverEntry).target.id)
+        } else {
+          // When no heading is intersecting, highlight the last one that
+          // scrolled above the viewport
+          let best: HTMLHeadingElement | null = null
+          for (const h of headings) {
+            if (h.getBoundingClientRect().top < 80) {
+              best = h
+            } else {
+              break
+            }
+          }
+          if (best) setActive(best.id)
+        }
+      },
+      {
+        rootMargin: "-80px 0px -60% 0px",
+        threshold: 0,
+      },
+    )
+
+    headings.forEach((h) => observer.observe(h))
+
+    // Clean up when the page is navigated away (view transitions)
+    document.addEventListener(
+      "astro:before-swap",
+      () => observer.disconnect(),
+      { once: true },
+    )
+  }
+
+  document.addEventListener("astro:page-load", initTocScrollSpy)
+</script>
+
+<style>
+  .blog-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+
+  .blog-main {
+    flex: 1;
+    min-width: 0;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  /* Sidebar TOC — hidden on smaller screens */
+  .sidebar-toc {
+    display: none;
+    width: 240px;
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .blog-main {
+      margin: 0;
+    }
+    .sidebar-toc {
+      display: block;
+      /* Stretch to the full row height so the sticky card can engage */
+      align-self: stretch;
+    }
+  }
+
+  /* ---- TOC card (sidebar) ---- */
+  .toc-card {
+    background: var(--color-surface);
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
+    position: sticky;
+    top: 80px;
+    max-height: calc(90vh - 80px);
+    overflow-y: auto;
+  }
+
+  .toc-card-title {
+    margin: 0 0 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .toc-card-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .toc-card-list li {
+    margin-top: 0.35em;
+  }
+
+  .toc-card-list a {
+    text-decoration: none;
+    color: var(--color-text-secondary);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    display: block;
+    transition: color 150ms ease;
+  }
+
+  .toc-card-list a:hover {
+    color: var(--color-accent);
+  }
+
+  .toc-card-list a.toc-active {
+    color: var(--color-accent);
+    font-weight: 700;
+  }
+
+  /* ---- Blog paper card ---- */
+  .blog-paper {
+    background: var(--color-surface);
+    border-radius: 16px;
+    padding: 24px 20px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
+  }
+
+  @media (min-width: 640px) {
+    .blog-paper {
+      padding: 36px 40px;
+    }
+  }
+
+  /* ---- Blog header ---- */
+  .blog-header {
+    margin-bottom: 28px;
+  }
+
+  .blog-date {
+    display: block;
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    margin-bottom: 8px;
+  }
+
+  .blog-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 12px;
+  }
+
+  .blog-tags .tag {
+    background: var(--color-accent-soft);
+    color: var(--color-accent);
+    padding: 2px 10px;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .blog-title {
+    margin: 0;
+    font-size: 1.9rem;
+    line-height: 1.45;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-feature-settings: "palt";
+    color: var(--color-text);
+  }
+
+  @media (max-width: 640px) {
+    .blog-title {
+      font-size: 1.5rem;
+    }
+  }
+
+  /* ---- Inline TOC (shown on smaller screens, hidden on ≥1024px) ---- */
+  .toc-inline {
+    background: var(--color-accent-soft);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 28px;
+    border: 1px solid var(--color-border);
+  }
+
+  @media (min-width: 1024px) {
+    .toc-inline {
+      display: none;
+    }
+  }
+
+  .toc-title {
+    margin: 0 0 10px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--color-accent);
+  }
+
+  .toc-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .toc-list li {
+    margin-top: 0.35em;
+  }
+
+  .toc-list a {
+    text-decoration: none;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    transition: color 150ms ease;
+  }
+
+  .toc-list a:hover {
+    color: var(--color-accent);
+  }
+
+  hr {
+    margin: 28px 0;
+    border: none;
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* ---- Post navigation ---- */
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 28px 0;
+  }
+
+  @media (max-width: 540px) {
+    .post-nav {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .post-nav-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 16px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--color-text);
+    transition:
+      border-color 200ms ease,
+      box-shadow 200ms ease;
+  }
+
+  .post-nav-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-card);
+    color: var(--color-text);
+  }
+
+  .post-nav-card--next {
+    text-align: right;
+  }
+
+  .post-nav-label {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+
+  .post-nav-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.45;
+    color: var(--color-text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .post-nav-card:hover .post-nav-title {
+    color: var(--color-accent);
+  }
+
+  /* ---- Recent posts ---- */
+  .recent-posts {
+    margin-top: 28px;
+  }
+
+  .recent-title {
+    font-size: 1rem;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    margin: 0 0 12px;
+    color: var(--color-text);
+  }
+
+  .recent-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .recent-item {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .recent-item:last-child {
+    border-bottom: none;
+  }
+
+  .recent-item::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .recent-item a {
+    text-decoration: none;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    transition: color 150ms ease;
+  }
+
+  .recent-item a:hover {
+    color: var(--color-accent);
+  }
+</style>

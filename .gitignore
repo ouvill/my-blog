@@ -1,4 +1,12 @@
-public
+.wrangler
+# Build output
+dist/
+
+# Astro cache
+.astro/
+
+# Netlify CLI local state (legacy — migrated to Cloudflare Pages)
+.netlify/
 
 .pnpm-store
 # Created by https://www.toptal.com/developers/gitignore/api/node

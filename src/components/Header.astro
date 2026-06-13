@@ -1,0 +1,305 @@
+---
+import { SITE_CONFIG } from "@lib/site"
+
+export interface Props {
+  isHome?: boolean
+}
+
+const { isHome = false } = Astro.props
+---
+
+<header class="site-header">
+  <div class="header-bar">
+    <div class="header-inner">
+      {!isHome && (
+        <a href="/" class="header-brand">
+          <img
+            src="/cherry-blossom.svg"
+            alt=""
+            width="22"
+            height="22"
+            class="brand-icon"
+          />
+          <span class="brand-name">{SITE_CONFIG.title}</span>
+        </a>
+      )}
+      {isHome && <div class="brand-spacer"></div>}
+
+      <nav class="site-nav" aria-label="メインナビゲーション">
+        <a href="/" class="nav-link">ブログ</a>
+        <a href="/contact/" class="nav-link">お問い合わせ</a>
+        <button
+          id="theme-toggle"
+          class="theme-toggle"
+          aria-label="テーマ切り替え"
+          type="button"
+        >
+          <!-- Sun icon (shown in dark mode) -->
+          <svg
+            class="icon-sun"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <!-- Moon icon (shown in light mode) -->
+          <svg
+            class="icon-moon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </nav>
+    </div>
+  </div>
+</header>
+
+{isHome && (
+  <div class="hero">
+    <div class="hero-inner">
+      <a href="/" class="hero-brand">
+        <img
+          src="/cherry-blossom.svg"
+          alt=""
+          width="40"
+          height="40"
+          class="hero-icon"
+        />
+        <span class="hero-title">{SITE_CONFIG.title}</span>
+      </a>
+      <p class="hero-description">{SITE_CONFIG.description}</p>
+      <p class="hero-tagline">技術メモと日常のあれこれを綴っています 🌸</p>
+    </div>
+  </div>
+)}
+
+<script is:inline>
+  ;(function () {
+    function bindThemeToggle() {
+      var btn = document.getElementById("theme-toggle")
+      if (!btn || btn.dataset.bound) return
+      btn.dataset.bound = "1"
+      btn.addEventListener("click", function () {
+        var current =
+          document.documentElement.getAttribute("data-theme") || "light"
+        var next = current === "dark" ? "light" : "dark"
+        document.documentElement.setAttribute("data-theme", next)
+        localStorage.setItem("theme", next)
+      })
+    }
+    bindThemeToggle()
+    document.addEventListener("astro:page-load", bindThemeToggle)
+  })()
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-bar {
+    background: rgba(253, 250, 248, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+    height: 64px;
+    display: flex;
+    align-items: center;
+  }
+
+  :global([data-theme="dark"]) .header-bar {
+    background: rgba(28, 26, 30, 0.82);
+  }
+
+  .header-inner {
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    color: var(--color-text);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 1rem;
+    transition: color 200ms ease;
+  }
+
+  .header-brand:hover {
+    color: var(--color-accent);
+  }
+
+  .brand-icon {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .brand-name {
+    white-space: nowrap;
+  }
+
+  .brand-spacer {
+    flex: 1;
+  }
+
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .nav-link {
+    text-decoration: none;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: color 200ms ease, background 200ms ease;
+  }
+
+  .nav-link:hover {
+    color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+
+  .theme-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: color 200ms ease, background 200ms ease, border-color 200ms ease;
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  .theme-toggle:hover {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+
+  /* Show moon in light mode, sun in dark mode */
+  .icon-sun {
+    display: none;
+  }
+
+  .icon-moon {
+    display: block;
+  }
+
+  :global([data-theme="dark"]) .icon-sun {
+    display: block;
+  }
+
+  :global([data-theme="dark"]) .icon-moon {
+    display: none;
+  }
+
+  /* ---- Hero section ---- */
+  .hero {
+    background: radial-gradient(
+      ellipse at 50% 0%,
+      var(--color-accent-soft) 0%,
+      transparent 70%
+    );
+    padding: 64px 16px 56px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hero-inner {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .hero-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--color-text);
+    margin-bottom: 20px;
+  }
+
+  .hero-brand:hover .hero-title {
+    color: var(--color-accent);
+  }
+
+  .hero-icon {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  .hero-title {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 2rem;
+    font-feature-settings: "palt";
+    color: var(--color-text);
+    transition: color 200ms ease;
+  }
+
+  @media (min-width: 640px) {
+    .hero-title {
+      font-size: 2.25rem;
+    }
+  }
+
+  .hero-description {
+    margin: 0 0 10px;
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    font-weight: 600;
+  }
+
+  .hero-tagline {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+</style>

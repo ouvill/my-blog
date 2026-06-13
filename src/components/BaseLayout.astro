@@ -1,0 +1,397 @@
+---
+import { SITE_CONFIG } from "@lib/site"
+import Header from "./Header.astro"
+import Footer from "./Footer.astro"
+import { ClientRouter } from "astro:transitions"
+
+export interface Props {
+  title: string
+  description?: string
+  image?: string
+  /** Whether to show the full "home" header */
+  isHome?: boolean
+  /** The canonical URL for this page (used for SEO) */
+  canonicalUrl?: string
+  /** If true, emit `<meta name="robots" content="noindex, nofollow" />` */
+  noindex?: boolean
+}
+
+const {
+  title,
+  description = SITE_CONFIG.description,
+  image,
+  isHome = false,
+  canonicalUrl,
+  noindex = false,
+} = Astro.props
+
+const pageTitle = `${title} | ${SITE_CONFIG.title}`
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    {image && <meta property="og:image" content={image} />}
+    {image && <meta name="twitter:image" content={image} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content={"@" + SITE_CONFIG.twitter} />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <title>{pageTitle}</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <ClientRouter />
+    <!-- Prevent flash of wrong theme — also re-applies after view-transition swaps -->
+    <script is:inline>
+      ;(function () {
+        function applyTheme() {
+          var stored = localStorage.getItem("theme")
+          var theme =
+            stored ||
+            (window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "dark"
+              : "light")
+          document.documentElement.setAttribute("data-theme", theme)
+        }
+        applyTheme()
+        document.addEventListener("astro:after-swap", applyTheme)
+      })()
+    </script>
+  </head>
+  <body>
+    <div class="root">
+      <div class="content">
+        <Header isHome={isHome} />
+        <main>
+          <slot />
+        </main>
+        <Footer />
+      </div>
+    </div>
+  </body>
+</html>
+
+<style is:global>
+  /* ---- Design tokens: Light theme ---- */
+  :root {
+    --color-bg: #fdfaf8;
+    --color-surface: #ffffff;
+    --color-text: #3a3335;
+    --color-text-secondary: #6b6266;
+    --color-text-muted: #9a8f93;
+    --color-accent: #c4536f;
+    --color-accent-strong: #a83f5b;
+    --color-accent-soft: #faeef1;
+    --color-border: #ece4e1;
+    --shadow-card: 0 1px 2px rgba(90, 60, 70, 0.06),
+      0 4px 16px rgba(90, 60, 70, 0.08);
+    --shadow-card-hover: 0 2px 4px rgba(90, 60, 70, 0.08),
+      0 12px 32px rgba(90, 60, 70, 0.14);
+    --font-sans: "Hiragino Kaku Gothic ProN", "Hiragino Sans",
+      "Noto Sans CJK JP", "メイリオ", Meiryo, -apple-system, BlinkMacSystemFont,
+      "Segoe UI", Roboto, sans-serif;
+    --font-heading: "Zen Maru Gothic", "Hiragino Kaku Gothic ProN",
+      "Hiragino Sans", "Noto Sans CJK JP", "メイリオ", Meiryo, sans-serif;
+    --font-mono: "SF Mono", "Fira Code", "Fira Mono", "Cascadia Code", Consolas,
+      "Noto Sans Mono", "Source Han Code JP", monospace;
+  }
+
+  /* ---- Design tokens: Dark theme ---- */
+  [data-theme="dark"] {
+    --color-bg: #1c1a1e;
+    --color-surface: #26232a;
+    --color-text: #ece7e9;
+    --color-text-secondary: #b5aab0;
+    --color-text-muted: #8a7f85;
+    --color-accent: #e08aa0;
+    --color-accent-strong: #eba6b8;
+    --color-accent-soft: rgba(224, 138, 160, 0.14);
+    --color-border: #3a353d;
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.2), 0 4px 16px rgba(0, 0, 0, 0.25);
+    --shadow-card-hover: 0 2px 4px rgba(0, 0, 0, 0.25),
+      0 12px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    line-height: 1.8;
+    transition:
+      background-color 0.25s,
+      color 0.25s;
+  }
+
+  a {
+    transition: color 200ms ease;
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  a:hover {
+    color: var(--color-accent-strong);
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  hr {
+    margin: 2em 0;
+    border: none;
+    border-top: 1px solid var(--color-border);
+  }
+
+  ::selection {
+    background: var(--color-accent-soft);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* ---- Shiki dual-theme support ---- */
+  .astro-code,
+  .astro-code span {
+    color: var(--shiki-light);
+    background-color: var(--shiki-light-bg);
+  }
+
+  [data-theme="dark"] .astro-code,
+  [data-theme="dark"] .astro-code span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+  }
+
+  .astro-code {
+    border-radius: 12px;
+    padding: 1em 1.25em;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    border: 1px solid var(--color-border);
+  }
+
+  /* ---- Shared content typography (blog articles & static pages) ---- */
+
+  .blog-content,
+  .page-content {
+    line-height: 1.95;
+    font-size: 1.0625rem;
+  }
+
+  .blog-content h2,
+  .page-content h2,
+  .blog-content h3,
+  .page-content h3,
+  .blog-content h4,
+  .page-content h4 {
+    margin-top: 1.8em;
+    line-height: 1.5;
+    font-family: var(--font-heading);
+    font-feature-settings: "palt";
+  }
+
+  .blog-content h1,
+  .page-content h1 {
+    font-size: 1.75rem;
+    margin: 0 0 1em;
+    line-height: 1.4;
+    font-family: var(--font-heading);
+    font-feature-settings: "palt";
+  }
+
+  .blog-content h2,
+  .page-content h2 {
+    font-size: 1.45rem;
+    border-left: 4px solid var(--color-accent);
+    padding-left: 0.75em;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .blog-content h3,
+  .page-content h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .blog-content h4,
+  .page-content h4 {
+    font-size: 1.1rem;
+  }
+
+  .blog-content p,
+  .page-content p {
+    margin: 1em 0;
+  }
+
+  .blog-content ul,
+  .page-content ul,
+  .blog-content ol,
+  .page-content ol {
+    margin: 0.8em 0;
+    padding-left: 1.5em;
+  }
+
+  .blog-content li,
+  .page-content li {
+    margin: 0.3em 0;
+    line-height: 1.7;
+  }
+
+  .blog-content blockquote,
+  .page-content blockquote {
+    margin: 1.5em 0;
+    padding: 0.75em 1.25em;
+    border-left: 4px solid var(--color-accent);
+    background: var(--color-accent-soft);
+    color: var(--color-text-secondary);
+    border-radius: 0 8px 8px 0;
+  }
+
+  .blog-content blockquote p,
+  .page-content blockquote p {
+    margin: 0.5em 0;
+  }
+
+  .blog-content pre,
+  .page-content pre {
+    border-radius: 12px;
+    padding: 1em 1.25em;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    border: 1px solid var(--color-border);
+  }
+
+  .blog-content code,
+  .page-content code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+  }
+
+  .blog-content :not(pre) > code,
+  .page-content :not(pre) > code {
+    background: var(--color-accent-soft);
+    padding: 0.15em 0.4em;
+    border-radius: 6px;
+    color: var(--color-accent);
+    word-break: break-all;
+  }
+
+  .blog-content img,
+  .page-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+  }
+
+  .blog-content table,
+  .page-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5em 0;
+    font-size: 0.9375rem;
+  }
+
+  .blog-content th,
+  .page-content th,
+  .blog-content td,
+  .page-content td {
+    border: 1px solid var(--color-border);
+    padding: 0.6em 0.8em;
+    text-align: left;
+  }
+
+  .blog-content th,
+  .page-content th {
+    background: var(--color-surface);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+
+  .blog-content tbody tr:nth-child(even),
+  .page-content tbody tr:nth-child(even) {
+    background: var(--color-accent-soft);
+  }
+
+  .blog-content a,
+  .page-content a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .blog-content a:hover,
+  .page-content a:hover {
+    color: var(--color-accent-strong);
+  }
+
+  /* ---- Reduced motion ---- */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+
+<style>
+  .root {
+    position: relative;
+    width: auto;
+    min-height: 100vh;
+    background-color: var(--color-bg);
+  }
+
+  .content {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  main {
+    position: relative;
+    z-index: 1;
+    /* Grow to fill remaining height so the footer stays at the bottom,
+       regardless of how many siblings (header / hero) precede it. */
+    flex: 1;
+    max-width: 1080px;
+    margin: 24px auto;
+    padding: 0 16px;
+    width: 100%;
+  }
+</style>

@@ -1,0 +1,386 @@
+---
+import BaseLayout from "@components/BaseLayout.astro"
+
+interface StatusMessage {
+  readonly type: "error" | "info"
+  readonly heading: string
+  readonly body: string
+}
+
+const STATUS_MESSAGES: Record<string, StatusMessage> = {
+  invalid_request: {
+    type: "error",
+    heading: "リクエストの形式が正しくありません",
+    body: "フォームの内容を確認して、もう一度送信してください。",
+  },
+  validation_error: {
+    type: "error",
+    heading: "入力内容に修正が必要です",
+    body: "フォームの内容を確認して、もう一度送信してください。",
+  },
+  server_error: {
+    type: "error",
+    heading: "送信処理で問題が発生しました",
+    body: "時間をおいて、もう一度送信してください。問題が続く場合は Twitter DM でお問い合わせください。",
+  },
+}
+---
+
+<BaseLayout title="お問い合わせ">
+  <div class="contact-page">
+    <h1 class="contact-heading">お問い合わせ</h1>
+
+    <p class="contact-intro">
+      ご依頼やご質問など、以下のフォームからお気軽にお送りください。
+    </p>
+
+    {/* This page is statically prerendered, so the `?status=` query parameter
+        is only available in the browser. All messages are rendered hidden and
+        the matching one is revealed by the client-side script below. */}
+    {
+      Object.entries(STATUS_MESSAGES).map(([key, message]) => (
+        <div
+          class:list={["status-message", { error: message.type === "error" }]}
+          data-status={key}
+          role="alert"
+          aria-live="assertive"
+          hidden
+        >
+          <p class="status-heading">{message.heading}</p>
+          <p class="status-body">{message.body}</p>
+        </div>
+      ))
+    }
+
+    <form method="POST" action="/api/contact" class="contact-form">
+      <!-- Honeypot field: visually hidden, bots will fill it in -->
+      <div aria-hidden="true" class="honeypot">
+        <label for="botField">このフィールドは入力しないでください</label>
+        <input
+          id="botField"
+          name="botField"
+          type="text"
+          tabindex="-1"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="form-field">
+        <label for="field-name">
+          お名前（ペンネーム可）<span class="required" aria-label="必須">*</span>
+        </label>
+        <input id="field-name" name="name" type="text" required />
+      </div>
+
+      <div class="form-field">
+        <label for="field-email">
+          メールアドレス<span class="required" aria-label="必須">*</span>
+        </label>
+        <input id="field-email" name="email" type="email" required />
+      </div>
+
+      <div class="form-field">
+        <label for="field-context">
+          お問い合わせ内容<span class="required" aria-label="必須">*</span>
+        </label>
+        <textarea id="field-context" name="context" rows="6" required></textarea>
+      </div>
+
+      <button type="submit" class="submit-button">送信する</button>
+    </form>
+
+    <div class="contact-fallback">
+      <p>
+        フォームがうまく動作しない場合は、時間をおいて再度お試しいただくか、<a
+          href="https://twitter.com/Ouvill"
+          target="_blank"
+          rel="noopener noreferrer">Twitter</a
+        >のDMでもお問い合わせください。
+      </p>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  function initContactPage() {
+    // Reveal status message from query param (plain-form fallback flow)
+    const status = new URLSearchParams(window.location.search).get("status")
+    if (status) {
+      const message = document.querySelector<HTMLElement>(
+        `.status-message[data-status="${CSS.escape(status)}"]`,
+      )
+      if (message) {
+        message.hidden = false
+        message.scrollIntoView({ behavior: "smooth", block: "nearest" })
+      }
+    }
+
+    // Progressive enhancement: intercept form submit and use fetch
+    const form = document.querySelector<HTMLFormElement>(".contact-form")
+    const submitBtn = form?.querySelector<HTMLButtonElement>(
+      "button[type='submit']",
+    )
+    if (!form || !submitBtn) return
+
+    // Avoid double-binding on repeated navigations
+    if ((form as HTMLFormElement & { _contactBound?: boolean })._contactBound) {
+      return
+    }
+    ;(form as HTMLFormElement & { _contactBound?: boolean })._contactBound = true
+
+    // Hide all status messages on fresh load
+    document
+      .querySelectorAll<HTMLElement>(".status-message")
+      .forEach((el) => {
+        if (!new URLSearchParams(window.location.search).get("status")) {
+          el.hidden = true
+        }
+      })
+
+    function showStatus(key: string) {
+      // Hide all first
+      document
+        .querySelectorAll<HTMLElement>(".status-message")
+        .forEach((el) => {
+          el.hidden = true
+        })
+      const msg = document.querySelector<HTMLElement>(
+        `.status-message[data-status="${CSS.escape(key)}"]`,
+      )
+      if (msg) {
+        msg.hidden = false
+        msg.scrollIntoView({ behavior: "smooth", block: "nearest" })
+      }
+    }
+
+    function setSubmitting(isSubmitting: boolean) {
+      if (isSubmitting) {
+        submitBtn!.disabled = true
+        submitBtn!.dataset.originalText = submitBtn!.textContent ?? ""
+        submitBtn!.innerHTML =
+          '<span class="btn-spinner" aria-hidden="true"></span>送信中…'
+      } else {
+        submitBtn!.disabled = false
+        submitBtn!.textContent =
+          submitBtn!.dataset.originalText ?? "送信する"
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault()
+      setSubmitting(true)
+
+      // Hide any previously shown status
+      document
+        .querySelectorAll<HTMLElement>(".status-message")
+        .forEach((el) => {
+          el.hidden = true
+        })
+
+      try {
+        const data = new FormData(form)
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: data,
+          redirect: "follow",
+        })
+
+        // Worker always 303-redirects on POST; fetch with redirect:"follow"
+        // follows it. Check the final URL to determine outcome.
+        const finalUrl = new URL(response.url)
+        if (
+          response.ok &&
+          finalUrl.pathname.startsWith("/contact/success")
+        ) {
+          // Success — navigate to the success page (reuse existing flow)
+          window.location.assign(finalUrl.href)
+          return
+        }
+
+        // Error — extract status param from redirect URL (e.g. /contact/?status=server_error)
+        const errorStatus =
+          finalUrl.searchParams.get("status") ?? "server_error"
+        showStatus(errorStatus)
+      } catch {
+        showStatus("server_error")
+      } finally {
+        setSubmitting(false)
+      }
+    })
+  }
+
+  // Run on initial load and after each view-transition navigation
+  document.addEventListener("astro:page-load", initContactPage)
+</script>
+
+<style>
+  .contact-page {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    background: var(--color-surface);
+    border-radius: 16px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
+  }
+
+  .contact-heading {
+    margin: 0 0 16px;
+    font-size: 1.75rem;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-feature-settings: "palt";
+    color: var(--color-text);
+  }
+
+  .contact-intro {
+    margin-bottom: 28px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* ---- Status message ---- */
+  .status-message {
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    border-radius: 10px;
+    border-left: 4px solid var(--color-accent);
+    background: var(--color-accent-soft);
+  }
+
+  .status-heading {
+    margin: 0 0 4px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--color-text);
+  }
+
+  .status-body {
+    margin: 0;
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+  }
+
+  /* ---- Honeypot: visually hidden for humans, present for bots ---- */
+  .honeypot {
+    position: absolute;
+    left: -9999px;
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
+  }
+
+  /* ---- Form ---- */
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-field label {
+    font-weight: 600;
+    font-size: 0.9375rem;
+    color: var(--color-text);
+  }
+
+  .required {
+    color: var(--color-accent);
+    margin-left: 2px;
+  }
+
+  .form-field input,
+  .form-field textarea {
+    font-family: var(--font-sans, sans-serif);
+    font-size: 1rem;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    transition:
+      border-color 200ms ease,
+      box-shadow 200ms ease;
+    line-height: 1.5;
+  }
+
+  .form-field input:focus,
+  .form-field textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-accent-soft);
+  }
+
+  .form-field textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  .submit-button {
+    display: inline-block;
+    align-self: flex-start;
+    padding: 12px 36px;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: var(--font-sans, sans-serif);
+    color: #fff;
+    background: var(--color-accent);
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: background 200ms ease;
+  }
+
+  .submit-button:hover:not(:disabled) {
+    background: var(--color-accent-strong);
+  }
+
+  .submit-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  .submit-button:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* Inline spinner inside the submit button */
+  .btn-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: btn-spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  @keyframes btn-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* ---- Fallback contact info ---- */
+  .contact-fallback {
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.9375rem;
+    color: var(--color-text-secondary);
+  }
+
+  .contact-fallback p {
+    margin: 0 0 8px;
+    line-height: 1.7;
+  }
+</style>

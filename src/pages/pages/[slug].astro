@@ -1,0 +1,68 @@
+---
+import type { CollectionEntry } from "astro:content"
+import BaseLayout from "@components/BaseLayout.astro"
+import { getAllPages } from "@lib/posts"
+import { entryIdToSlug, pageUrlPath } from "@lib/slug"
+import { SITE_CONFIG } from "@lib/site"
+
+export interface Params {
+  slug: string
+}
+
+export async function getStaticPaths() {
+  const pages = await getAllPages()
+  return pages.map((p: CollectionEntry<"pages">) => ({
+    params: { slug: entryIdToSlug(p.id) },
+  }))
+}
+
+const { slug } = Astro.params
+const allPages = await getAllPages()
+const page = allPages.find(
+  (p: CollectionEntry<"pages">) => entryIdToSlug(p.id) === slug,
+)
+
+if (!page) {
+  return Astro.redirect("/404", 404)
+}
+
+const { Content } = await page.render()
+const canonicalUrl = `${SITE_CONFIG.url}${pageUrlPath(entryIdToSlug(page.id))}`
+---
+
+<BaseLayout title={page.data.title} canonicalUrl={canonicalUrl}>
+  <article class="page-paper">
+    <h1 class="page-heading">{page.data.title}</h1>
+    <div class="page-content">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .page-paper {
+    background: var(--color-surface);
+    border-radius: 16px;
+    padding: 24px 20px;
+    max-width: 720px;
+    margin: 0 auto;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--color-border);
+  }
+
+  @media (min-width: 640px) {
+    .page-paper {
+      padding: 36px 40px;
+    }
+  }
+
+  .page-heading {
+    margin: 0 0 1.25em;
+    font-size: 1.75rem;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-feature-settings: "palt";
+    line-height: 1.4;
+    color: var(--color-text);
+  }
+</style>

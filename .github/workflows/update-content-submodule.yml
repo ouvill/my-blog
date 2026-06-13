@@ -1,0 +1,67 @@
+# Purpose: runs after content repo main push dispatches blog-content-updated; updates
+#   src/content/blog submodule and opens/updates PR.
+# Content repo requirement: content repo must have a workflow on main push sending
+#   repository_dispatch event type blog-content-updated to this app repo.
+# App repo branch/config: checks out master; update ref/branches if app default branch is renamed.
+# Required app repo secret: SUBMODULE_UPDATE_TOKEN.
+# Token permissions: fine-grained PAT scoped to Ouvill/gatsbyjs_blog with Contents read/write;
+#   classic PAT public_repo for public or repo for private.
+# Why PAT is required: using GITHUB_TOKEN for create-pull-request can suppress CI on the generated PR.
+# Required submodule: src/content/blog configured in .gitmodules and accessible to the token if private.
+# Cloudflare note: this workflow does not deploy; merge to master triggers Cloudflare Git integration.
+# Optional manual trigger: workflow_dispatch can be used to re-run submodule update.
+name: Update Content Submodule
+
+on:
+  repository_dispatch:
+    types: [blog-content-updated]
+  workflow_dispatch:
+
+concurrency:
+  group: update-content-submodule
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    env:
+      SUBMODULE_UPDATE_TOKEN: ${{ secrets.SUBMODULE_UPDATE_TOKEN }}
+
+    steps:
+      - name: Validate SUBMODULE_UPDATE_TOKEN
+        run: |
+          if [ -z "$SUBMODULE_UPDATE_TOKEN" ]; then
+            echo "::error::SUBMODULE_UPDATE_TOKEN secret is not set or is empty. This secret is required for checkout and pull request creation."
+            exit 1
+          fi
+          echo "SUBMODULE_UPDATE_TOKEN is configured."
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          fetch-depth: 0
+          submodules: recursive
+          token: ${{ secrets.SUBMODULE_UPDATE_TOKEN }}
+
+      - name: Update content submodule
+        run: |
+          git submodule update --remote src/content/blog
+
+      - name: Create or update pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.SUBMODULE_UPDATE_TOKEN }}
+          commit-message: "chore(content): update blog content submodule"
+          title: "Update blog content"
+          body: |
+            This PR updates the `src/content/blog` submodule to the latest commit from the content repository.
+
+            Triggered by repository_dispatch (`blog-content-updated`) or manual workflow_dispatch.
+          branch: content/update-blog-content
+          delete-branch: true
