@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content"
+import { render } from "astro:content"
 import BaseLayout from "@components/BaseLayout.astro"
 import { getAllPages } from "@lib/posts"
 import { entryIdToSlug, pageUrlPath } from "@lib/slug"
@@ -26,7 +27,7 @@ if (!page) {
   return Astro.redirect("/404", 404)
 }
 
-const { Content } = await page.render()
+const { Content } = await render(page)
 const canonicalUrl = `${SITE_CONFIG.url}${pageUrlPath(entryIdToSlug(page.id))}`
 ---
 
