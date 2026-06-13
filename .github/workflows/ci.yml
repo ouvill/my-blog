@@ -1,0 +1,39 @@
+# Purpose: validates the Astro blog app when PRs or pushes target app repo master.
+# Required branch/config: app repo default branch is currently master; update branches if renamed.
+# Required submodule: src/content/blog must be available as a git submodule; checkout uses submodules: recursive.
+# Required environment: Node.js 22, package-lock.json/npm ci.
+# Cloudflare note: this workflow does not deploy; Cloudflare Git integration deploys after master updates.
+# Required secrets: none.
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
