@@ -102,15 +102,115 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
 </BaseLayout>
 
 <script>
-  const status = new URLSearchParams(window.location.search).get("status")
-  if (status) {
-    const message = document.querySelector<HTMLElement>(
-      `.status-message[data-status="${CSS.escape(status)}"]`,
-    )
-    if (message) {
-      message.hidden = false
+  function initContactPage() {
+    // Reveal status message from query param (plain-form fallback flow)
+    const status = new URLSearchParams(window.location.search).get("status")
+    if (status) {
+      const message = document.querySelector<HTMLElement>(
+        `.status-message[data-status="${CSS.escape(status)}"]`,
+      )
+      if (message) {
+        message.hidden = false
+        message.scrollIntoView({ behavior: "smooth", block: "nearest" })
+      }
     }
+
+    // Progressive enhancement: intercept form submit and use fetch
+    const form = document.querySelector<HTMLFormElement>(".contact-form")
+    const submitBtn = form?.querySelector<HTMLButtonElement>(
+      "button[type='submit']",
+    )
+    if (!form || !submitBtn) return
+
+    // Avoid double-binding on repeated navigations
+    if ((form as HTMLFormElement & { _contactBound?: boolean })._contactBound) {
+      return
+    }
+    ;(form as HTMLFormElement & { _contactBound?: boolean })._contactBound = true
+
+    // Hide all status messages on fresh load
+    document
+      .querySelectorAll<HTMLElement>(".status-message")
+      .forEach((el) => {
+        if (!new URLSearchParams(window.location.search).get("status")) {
+          el.hidden = true
+        }
+      })
+
+    function showStatus(key: string) {
+      // Hide all first
+      document
+        .querySelectorAll<HTMLElement>(".status-message")
+        .forEach((el) => {
+          el.hidden = true
+        })
+      const msg = document.querySelector<HTMLElement>(
+        `.status-message[data-status="${CSS.escape(key)}"]`,
+      )
+      if (msg) {
+        msg.hidden = false
+        msg.scrollIntoView({ behavior: "smooth", block: "nearest" })
+      }
+    }
+
+    function setSubmitting(isSubmitting: boolean) {
+      if (isSubmitting) {
+        submitBtn!.disabled = true
+        submitBtn!.dataset.originalText = submitBtn!.textContent ?? ""
+        submitBtn!.innerHTML =
+          '<span class="btn-spinner" aria-hidden="true"></span>送信中…'
+      } else {
+        submitBtn!.disabled = false
+        submitBtn!.textContent =
+          submitBtn!.dataset.originalText ?? "送信する"
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault()
+      setSubmitting(true)
+
+      // Hide any previously shown status
+      document
+        .querySelectorAll<HTMLElement>(".status-message")
+        .forEach((el) => {
+          el.hidden = true
+        })
+
+      try {
+        const data = new FormData(form)
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: data,
+          redirect: "follow",
+        })
+
+        // Worker always 303-redirects on POST; fetch with redirect:"follow"
+        // follows it. Check the final URL to determine outcome.
+        const finalUrl = new URL(response.url)
+        if (
+          response.ok &&
+          finalUrl.pathname.startsWith("/contact/success")
+        ) {
+          // Success — navigate to the success page (reuse existing flow)
+          window.location.assign(finalUrl.href)
+          return
+        }
+
+        // Error — extract status param from redirect URL (e.g. /contact/?status=server_error)
+        const errorStatus =
+          finalUrl.searchParams.get("status") ?? "server_error"
+        showStatus(errorStatus)
+      } catch {
+        showStatus("server_error")
+      } finally {
+        setSubmitting(false)
+      }
+    })
   }
+
+  // Run on initial load and after each view-transition navigation
+  document.addEventListener("astro:page-load", initContactPage)
 </script>
 
 <style>
@@ -237,13 +337,37 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
     transition: background 200ms ease;
   }
 
-  .submit-button:hover {
+  .submit-button:hover:not(:disabled) {
     background: var(--color-accent-strong);
+  }
+
+  .submit-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
 
   .submit-button:focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 2px;
+  }
+
+  /* Inline spinner inside the submit button */
+  .btn-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: btn-spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  @keyframes btn-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   /* ---- Fallback contact info ---- */
