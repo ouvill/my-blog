@@ -5,15 +5,19 @@ import { blogEntryIdToSlug } from "./slug"
 export type BlogPost = CollectionEntry<"blog">
 
 /**
- * Load all blog posts, sorted by date descending (most recent first).
+ * Load all blog posts, filtering out unpublished posts
+ * (`published: false` in frontmatter), sorted by date descending
+ * (most recent first).
  * Each post's `slug` is computed from its entry `id`.
  */
 export async function getAllPosts(): Promise<BlogPost[]> {
   const posts = await getCollection("blog")
-  return posts.sort(
-    (a: BlogPost, b: BlogPost) =>
-      b.data.date.getTime() - a.data.date.getTime(),
-  )
+  return posts
+    .filter((post: BlogPost) => post.data.published !== false)
+    .sort(
+      (a: BlogPost, b: BlogPost) =>
+        b.data.date.getTime() - a.data.date.getTime(),
+    )
 }
 
 /**

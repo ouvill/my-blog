@@ -40,6 +40,7 @@ const blogCollection = defineCollection({
     description: z.string().optional().nullable(),
     subTitle: z.string().optional().nullable(),
     cover: z.string().optional().nullable(),
+    published: z.boolean().optional(),
   }),
 })
 
