@@ -27,10 +27,16 @@ binding = "ASSETS"
 # unmatched routes (Astro generates dist/404.html from src/pages/404.astro).
 html_handling = "force-trailing-slash"
 not_found_handling = "404-page"
-# Browser form submissions send `Sec-Fetch-Mode: navigate`, which makes the
-# asset router treat the request as a page navigation and answer 405 before
-# the Worker runs. Route /api/* to the Worker unconditionally.
-run_worker_first = ["/api/*"]
+# Route these paths to the Worker unconditionally (the asset router would
+# otherwise intercept them):
+#   /api/*           — Contact form submission endpoint (POST handler).
+#   /sw.js, /service-worker.js — Temporary migration routes: serve the old
+#                                 Gatsby Service Worker unregistration
+#                                 script from the Worker.  These can be
+#                                 removed once a sufficient migration window
+#                                 has passed (most clients will have received
+#                                 the unregistration script by then).
+run_worker_first = ["/api/*", "/sw.js", "/service-worker.js"]
 
 # Cloudflare Email Service — Email Sending binding
 # Docs: https://developers.cloudflare.com/email-service/
