@@ -3,7 +3,7 @@
 # Required submodule: src/content/blog must be available as a git submodule; checkout uses submodules: recursive.
 # Required environment: Node.js 22, package-lock.json/npm ci.
 # Cloudflare note: this workflow does not deploy; Cloudflare Git integration deploys after master updates.
-# Required secrets: SUBMODULE_UPDATE_TOKEN.
+# Required secrets: SUBMODULE_UPDATE_TOKEN (except Dependabot PRs, which run without submodules).
 name: CI
 
 on:
@@ -28,6 +28,7 @@ jobs:
 
     steps:
       - name: Validate SUBMODULE_UPDATE_TOKEN
+        if: ${{ github.actor != 'dependabot[bot]' }}
         run: |
           if [ -z "$SUBMODULE_UPDATE_TOKEN" ]; then
             echo "::error::SUBMODULE_UPDATE_TOKEN secret is not set or is empty. This secret is required for private submodule checkout."
@@ -37,8 +38,8 @@ jobs:
 
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
-          token: ${{ secrets.SUBMODULE_UPDATE_TOKEN }}
+          submodules: ${{ github.actor != 'dependabot[bot]' && 'recursive' || 'false' }}
+          token: ${{ github.actor != 'dependabot[bot]' && secrets.SUBMODULE_UPDATE_TOKEN || github.token }}
 
       - name: Use Node.js 22
         uses: actions/setup-node@v4
