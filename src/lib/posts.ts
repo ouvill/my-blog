@@ -16,7 +16,7 @@ export async function getAllPosts(): Promise<BlogPost[]> {
     .filter((post: BlogPost) => post.data.published !== false)
     .sort(
       (a: BlogPost, b: BlogPost) =>
-        b.data.date.getTime() - a.data.date.getTime(),
+        b.data.date.getTime() - a.data.date.getTime()
     )
 }
 
@@ -25,7 +25,7 @@ export async function getAllPosts(): Promise<BlogPost[]> {
  * The slug is the path after `/blog/` and before the trailing `/`.
  */
 export async function getPostBySlug(
-  slug: string,
+  slug: string
 ): Promise<BlogPost | undefined> {
   const posts = await getAllPosts()
   return posts.find((p) => blogEntryIdToSlug(p.id) === slug)

@@ -11,7 +11,7 @@ interface ImageModule {
  */
 const blogImages: Record<string, ImageModule> = import.meta.glob(
   "/src/content/blog/**/*.{png,jpg,jpeg,gif,webp}",
-  { eager: true },
+  { eager: true }
 )
 
 /**
@@ -51,7 +51,7 @@ const FALLBACK_COVERS = ["thumb.jpg", "cover.jpg", "cover.png"]
  * @returns An absolute URL path (e.g., "/_astro/cover.hash.png") or null.
  */
 export function resolveCoverOrNull(
-  post: CollectionEntry<"blog">,
+  post: CollectionEntry<"blog">
 ): string | null {
   const postDir = getPostDir(post.id)
   const rawCover = post.data.cover

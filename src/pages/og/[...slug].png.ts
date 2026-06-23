@@ -12,10 +12,7 @@ export async function getStaticPaths() {
       params: { slug: blogEntryIdToSlug(post.id) },
       props: {
         title: post.data.title,
-        tags: [
-          ...(post.data.tags ?? []),
-          ...(post.data.tag ?? []),
-        ].slice(0, 3),
+        tags: [...(post.data.tags ?? []), ...(post.data.tag ?? [])].slice(0, 3),
       },
     }))
 }

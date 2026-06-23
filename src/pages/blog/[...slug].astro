@@ -55,8 +55,11 @@ const dateStr = post.data.date.toLocaleDateString("ja-JP", {
 const allTags = [...(post.data.tags ?? []), ...(post.data.tag ?? [])]
 
 // Previous/next posts
-const currentIndex = posts.findIndex((p) => blogEntryIdToSlug(p.id) === fullSlug)
-const prevPost = currentIndex < posts.length - 1 ? posts[currentIndex + 1] : null
+const currentIndex = posts.findIndex(
+  (p) => blogEntryIdToSlug(p.id) === fullSlug
+)
+const prevPost =
+  currentIndex < posts.length - 1 ? posts[currentIndex + 1] : null
 const nextPost = currentIndex > 0 ? posts[currentIndex - 1] : null
 
 // Recent posts (3 latest, excluding current)
@@ -96,9 +99,7 @@ const recentPosts = posts
               <p class="toc-title">目次</p>
               <ul class="toc-list">
                 {headings
-                  .filter(
-                    (h: MarkdownHeading) => h.depth >= 2 && h.depth <= 3,
-                  )
+                  .filter((h: MarkdownHeading) => h.depth >= 2 && h.depth <= 3)
                   .map((h: MarkdownHeading) => (
                     <li style={`padding-left: ${(h.depth - 2) * 16}px`}>
                       <a href={`#${h.slug}`}>{h.text}</a>
@@ -175,9 +176,7 @@ const recentPosts = posts
             <p class="toc-card-title">目次</p>
             <ul class="toc-card-list">
               {headings
-                .filter(
-                  (h: MarkdownHeading) => h.depth >= 2 && h.depth <= 3,
-                )
+                .filter((h: MarkdownHeading) => h.depth >= 2 && h.depth <= 3)
                 .map((h: MarkdownHeading) => (
                   <li style={`padding-left: ${(h.depth - 2) * 16}px`}>
                     <a href={`#${h.slug}`}>{h.text}</a>
@@ -197,7 +196,7 @@ const recentPosts = posts
     if (!sidebar) return
 
     const tocLinks = Array.from(
-      sidebar.querySelectorAll<HTMLAnchorElement>(".toc-card-list a[href^='#']"),
+      sidebar.querySelectorAll<HTMLAnchorElement>(".toc-card-list a[href^='#']")
     )
     if (tocLinks.length === 0) return
 
@@ -205,7 +204,7 @@ const recentPosts = posts
     if (!content) return
 
     const headings = Array.from(
-      content.querySelectorAll<HTMLHeadingElement>("h2, h3"),
+      content.querySelectorAll<HTMLHeadingElement>("h2, h3")
     )
     if (headings.length === 0) return
 
@@ -228,8 +227,7 @@ const recentPosts = posts
           if (entry.isIntersecting) {
             if (
               topEntry === null ||
-              entry.boundingClientRect.top <
-                topEntry.boundingClientRect.top
+              entry.boundingClientRect.top < topEntry.boundingClientRect.top
             ) {
               topEntry = entry
             }
@@ -255,7 +253,7 @@ const recentPosts = posts
       {
         rootMargin: "-80px 0px -60% 0px",
         threshold: 0,
-      },
+      }
     )
 
     headings.forEach((h) => observer.observe(h))
@@ -264,7 +262,7 @@ const recentPosts = posts
     document.addEventListener(
       "astro:before-swap",
       () => observer.disconnect(),
-      { once: true },
+      { once: true }
     )
   }
 

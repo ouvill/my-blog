@@ -17,7 +17,7 @@ export interface PaginationInfo {
  */
 export function getPaginationInfo(
   totalItems: number,
-  currentPage: number,
+  currentPage: number
 ): PaginationInfo {
   const total = Math.max(1, Math.ceil(totalItems / POSTS_PER_PAGE))
   return {

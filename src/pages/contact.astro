@@ -34,9 +34,11 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
       ご依頼やご質問など、以下のフォームからお気軽にお送りください。
     </p>
 
-    {/* This page is statically prerendered, so the `?status=` query parameter
+    {
+      /* This page is statically prerendered, so the `?status=` query parameter
         is only available in the browser. All messages are rendered hidden and
-        the matching one is revealed by the client-side script below. */}
+        the matching one is revealed by the client-side script below. */
+    }
     {
       Object.entries(STATUS_MESSAGES).map(([key, message]) => (
         <div
@@ -67,7 +69,8 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
 
       <div class="form-field">
         <label for="field-name">
-          お名前（ペンネーム可）<span class="required" aria-label="必須">*</span>
+          お名前（ペンネーム可）<span class="required" aria-label="必須">*</span
+          >
         </label>
         <input id="field-name" name="name" type="text" required />
       </div>
@@ -83,7 +86,8 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
         <label for="field-context">
           お問い合わせ内容<span class="required" aria-label="必須">*</span>
         </label>
-        <textarea id="field-context" name="context" rows="6" required></textarea>
+        <textarea id="field-context" name="context" rows="6" required
+        ></textarea>
       </div>
 
       <button type="submit" class="submit-button">送信する</button>
@@ -107,7 +111,7 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
     const status = new URLSearchParams(window.location.search).get("status")
     if (status) {
       const message = document.querySelector<HTMLElement>(
-        `.status-message[data-status="${CSS.escape(status)}"]`,
+        `.status-message[data-status="${CSS.escape(status)}"]`
       )
       if (message) {
         message.hidden = false
@@ -118,7 +122,7 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
     // Progressive enhancement: intercept form submit and use fetch
     const form = document.querySelector<HTMLFormElement>(".contact-form")
     const submitBtn = form?.querySelector<HTMLButtonElement>(
-      "button[type='submit']",
+      "button[type='submit']"
     )
     if (!form || !submitBtn) return
 
@@ -126,16 +130,15 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
     if ((form as HTMLFormElement & { _contactBound?: boolean })._contactBound) {
       return
     }
-    ;(form as HTMLFormElement & { _contactBound?: boolean })._contactBound = true
+    ;(form as HTMLFormElement & { _contactBound?: boolean })._contactBound =
+      true
 
     // Hide all status messages on fresh load
-    document
-      .querySelectorAll<HTMLElement>(".status-message")
-      .forEach((el) => {
-        if (!new URLSearchParams(window.location.search).get("status")) {
-          el.hidden = true
-        }
-      })
+    document.querySelectorAll<HTMLElement>(".status-message").forEach((el) => {
+      if (!new URLSearchParams(window.location.search).get("status")) {
+        el.hidden = true
+      }
+    })
 
     function showStatus(key: string) {
       // Hide all first
@@ -145,7 +148,7 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
           el.hidden = true
         })
       const msg = document.querySelector<HTMLElement>(
-        `.status-message[data-status="${CSS.escape(key)}"]`,
+        `.status-message[data-status="${CSS.escape(key)}"]`
       )
       if (msg) {
         msg.hidden = false
@@ -161,8 +164,7 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
           '<span class="btn-spinner" aria-hidden="true"></span>送信中…'
       } else {
         submitBtn!.disabled = false
-        submitBtn!.textContent =
-          submitBtn!.dataset.originalText ?? "送信する"
+        submitBtn!.textContent = submitBtn!.dataset.originalText ?? "送信する"
       }
     }
 
@@ -188,10 +190,7 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
         // Worker always 303-redirects on POST; fetch with redirect:"follow"
         // follows it. Check the final URL to determine outcome.
         const finalUrl = new URL(response.url)
-        if (
-          response.ok &&
-          finalUrl.pathname.startsWith("/contact/success")
-        ) {
+        if (response.ok && finalUrl.pathname.startsWith("/contact/success")) {
           // Success — navigate to the success page (reuse existing flow)
           window.location.assign(finalUrl.href)
           return

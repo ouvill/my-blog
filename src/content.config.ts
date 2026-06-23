@@ -31,12 +31,16 @@ const blogCollection = defineCollection({
       .array(z.string().nullable())
       .optional()
       .nullable()
-      .transform((arr) => arr?.filter((t): t is string => t != null) ?? undefined),
+      .transform(
+        (arr) => arr?.filter((t): t is string => t != null) ?? undefined
+      ),
     tag: z
       .array(z.string().nullable())
       .optional()
       .nullable()
-      .transform((arr) => arr?.filter((t): t is string => t != null) ?? undefined),
+      .transform(
+        (arr) => arr?.filter((t): t is string => t != null) ?? undefined
+      ),
     description: z.string().optional().nullable(),
     subTitle: z.string().optional().nullable(),
     cover: z.string().optional().nullable(),

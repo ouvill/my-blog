@@ -34,7 +34,7 @@ function getAvatarDataUri(): Promise<string> {
   if (!avatarDataUriPromise) {
     const avatarPath = join(projectRoot, "public/profile-pic.png")
     avatarDataUriPromise = readFile(avatarPath).then(
-      (buf) => `data:image/png;base64,${buf.toString("base64")}`,
+      (buf) => `data:image/png;base64,${buf.toString("base64")}`
     )
   }
   return avatarDataUriPromise
@@ -54,7 +54,7 @@ function getSakuraDataUri(): Promise<string> {
         })
         .png()
         .toBuffer()
-        .then((buf) => `data:image/png;base64,${buf.toString("base64")}`),
+        .then((buf) => `data:image/png;base64,${buf.toString("base64")}`)
     )
   }
   return sakuraDataUriPromise
@@ -70,7 +70,7 @@ function getSakuraLargeDataUri(): Promise<string> {
         .resize({ width: 360 })
         .png()
         .toBuffer()
-        .then((buf) => `data:image/png;base64,${buf.toString("base64")}`),
+        .then((buf) => `data:image/png;base64,${buf.toString("base64")}`)
     )
   }
   return sakuraLargeDataUriPromise
@@ -112,7 +112,7 @@ export async function renderOgCard(input: OgCardInput): Promise<ArrayBuffer> {
     width: number,
     height: number,
     rotate: number,
-    opacity: number,
+    opacity: number
   ) {
     return {
       type: "div",
@@ -143,15 +143,23 @@ export async function renderOgCard(input: OgCardInput): Promise<ArrayBuffer> {
     offset: Record<string, number>,
     size: number,
     rotate: number,
-    opacity: number,
+    opacity: number
   ) => bloom(sakuraUri, offset, size, size, rotate, opacity)
   // Tall composition (two blossoms + two petals); native aspect ≈ 0.4716.
   const sakuraLarge = (
     offset: Record<string, number>,
     width: number,
     rotate: number,
-    opacity: number,
-  ) => bloom(sakuraLargeUri, offset, width, Math.round(width * 2.1205), rotate, opacity)
+    opacity: number
+  ) =>
+    bloom(
+      sakuraLargeUri,
+      offset,
+      width,
+      Math.round(width * 2.1205),
+      rotate,
+      opacity
+    )
 
   const vdom = {
     type: "div",

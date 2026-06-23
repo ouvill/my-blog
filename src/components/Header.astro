@@ -11,19 +11,21 @@ const { isHome = false } = Astro.props
 <header class="site-header">
   <div class="header-bar">
     <div class="header-inner">
-      {!isHome && (
-        <a href="/" class="header-brand">
-          <img
-            src="/cherry-blossom.svg"
-            alt=""
-            width="22"
-            height="22"
-            class="brand-icon"
-          />
-          <span class="brand-name">{SITE_CONFIG.title}</span>
-        </a>
-      )}
-      {isHome && <div class="brand-spacer"></div>}
+      {
+        !isHome && (
+          <a href="/" class="header-brand">
+            <img
+              src="/cherry-blossom.svg"
+              alt=""
+              width="22"
+              height="22"
+              class="brand-icon"
+            />
+            <span class="brand-name">{SITE_CONFIG.title}</span>
+          </a>
+        )
+      }
+      {isHome && <div class="brand-spacer" />}
 
       <nav class="site-nav" aria-label="メインナビゲーション">
         <a href="/" class="nav-link">ブログ</a>
@@ -80,24 +82,26 @@ const { isHome = false } = Astro.props
   </div>
 </header>
 
-{isHome && (
-  <div class="hero">
-    <div class="hero-inner">
-      <a href="/" class="hero-brand">
-        <img
-          src="/cherry-blossom.svg"
-          alt=""
-          width="40"
-          height="40"
-          class="hero-icon"
-        />
-        <span class="hero-title">{SITE_CONFIG.title}</span>
-      </a>
-      <p class="hero-description">{SITE_CONFIG.description}</p>
-      <p class="hero-tagline">技術メモと日常のあれこれを綴っています 🌸</p>
+{
+  isHome && (
+    <div class="hero">
+      <div class="hero-inner">
+        <a href="/" class="hero-brand">
+          <img
+            src="/cherry-blossom.svg"
+            alt=""
+            width="40"
+            height="40"
+            class="hero-icon"
+          />
+          <span class="hero-title">{SITE_CONFIG.title}</span>
+        </a>
+        <p class="hero-description">{SITE_CONFIG.description}</p>
+        <p class="hero-tagline">技術メモと日常のあれこれを綴っています 🌸</p>
+      </div>
     </div>
-  </div>
-)}
+  )
+}
 
 <script is:inline>
   ;(function () {
@@ -192,7 +196,9 @@ const { isHome = false } = Astro.props
     font-size: 0.9rem;
     padding: 8px 12px;
     border-radius: 8px;
-    transition: color 200ms ease, background 200ms ease;
+    transition:
+      color 200ms ease,
+      background 200ms ease;
   }
 
   .nav-link:hover {
@@ -211,7 +217,10 @@ const { isHome = false } = Astro.props
     background: var(--color-surface);
     color: var(--color-text-secondary);
     cursor: pointer;
-    transition: color 200ms ease, background 200ms ease, border-color 200ms ease;
+    transition:
+      color 200ms ease,
+      background 200ms ease,
+      border-color 200ms ease;
     padding: 0;
     flex-shrink: 0;
   }
