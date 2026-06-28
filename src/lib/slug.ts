@@ -2,15 +2,17 @@
  * Compute a URL slug from a content entry ID, mirroring Gatsby's createFilePath.
  *
  * In Astro content collections using `glob()` loaders, the entry `id` is the
- * path relative to the base directory, including the `.md` extension.
+ * path relative to the base directory, including the `.md` or `.mdx` extension.
  *
- * - `"dir/index.md"`  → `"dir"`       (index.md files)
- * - `"dir/file.md"`   → `"dir/file"`  (non-index .md files)
+ * - `"dir/index.md"`   → `"dir"`       (index.md files)
+ * - `"dir/file.md"`    → `"dir/file"`  (non-index .md files)
+ * - `"dir/index.mdx"`  → `"dir"`       (index.mdx files)
+ * - `"dir/file.mdx"`   → `"dir/file"`  (non-index .mdx files)
  */
 export function entryIdToSlug(id: string): string {
-  // Strip the .md extension if present
-  const base = id.endsWith(".md") ? id.slice(0, -3) : id
-  // For index.md files, remove the trailing "/index"
+  // Strip the .md or .mdx extension if present
+  const base = id.replace(/\.mdx?$/, "")
+  // For index files, remove the trailing "/index"
   if (base.endsWith("/index")) {
     return base.slice(0, -6)
   }
