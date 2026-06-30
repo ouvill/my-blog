@@ -89,6 +89,7 @@ export interface ContactEnv {
   readonly CONTACT_DB?: D1Database
   readonly CONTACT_TO_EMAIL?: string
   readonly CONTACT_FROM_EMAIL?: string
+  readonly TURNSTILE_SECRET_KEY?: string
 }
 
 /** Minimal subset of the Cloudflare Pages Function context we actually use. */
@@ -103,6 +104,9 @@ interface PagesFunctionContext {
 
 const SUCCESS_REDIRECT_URL = "/contact/success/"
 const FORM_REDIRECT_URL = "/contact/"
+
+const TURNSTILE_SITEVERIFY_URL =
+  "https://challenges.cloudflare.com/turnstile/v0/siteverify"
 
 /** Maximum allowed length for each input field. */
 const LIMITS = {
@@ -168,6 +172,61 @@ function escapeHtml(value: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;")
+}
+
+/**
+ * Verify a Turnstile token against Cloudflare's siteverify endpoint.
+ *
+ * Returns:
+ *   { ok: true }                      – token is valid
+ *   { ok: false; reason: "..." }      – token missing/invalid (treat as bot)
+ *   { ok: false; reason: "misconfig" }– secret not configured (fail closed)
+ *
+ * Never throws; network/parse errors resolve to ok:false. Errors are logged
+ * server-side via console.error and never exposed to the client.
+ */
+async function verifyTurnstile(
+  env: ContactEnv,
+  token: string | undefined,
+  remoteIp: string | undefined,
+): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const secret = env.TURNSTILE_SECRET_KEY
+  if (!secret) {
+    console.error(
+      "Contact form: TURNSTILE_SECRET_KEY is not configured — cannot verify Turnstile.",
+    )
+    return { ok: false, reason: "misconfig" }
+  }
+  const trimmed = token?.trim() ?? ""
+  if (trimmed.length === 0) {
+    return { ok: false, reason: "missing_token" }
+  }
+  try {
+    const body = new FormData()
+    body.append("secret", secret)
+    body.append("response", trimmed)
+    if (remoteIp) body.append("remoteip", remoteIp)
+    const res = await fetch(TURNSTILE_SITEVERIFY_URL, {
+      method: "POST",
+      body,
+    })
+    const data = (await res.json()) as {
+      success?: boolean
+      "error-codes"?: string[]
+    }
+    if (data.success === true) {
+      return { ok: true }
+    }
+    console.error(
+      "Contact form: Turnstile verification failed —",
+      (data["error-codes"] ?? []).join(", ") || "unknown",
+    )
+    return { ok: false, reason: "verification_failed" }
+  } catch (err) {
+    const detail = err instanceof Error ? err.message : String(err)
+    console.error("Contact form: Turnstile siteverify threw —", detail)
+    return { ok: false, reason: "verification_failed" }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -409,11 +468,13 @@ export const onRequest = async (
   let rawEmail: string | undefined
   let rawContext: string | undefined
   let rawBotField: string | undefined
+  let rawTurnstileToken: string | undefined
   try {
     rawName = textField(form, "name")
     rawEmail = textField(form, "email")
     rawContext = textField(form, "context")
     rawBotField = textField(form, "botField")
+    rawTurnstileToken = textField(form, "cf-turnstile-response")
   } catch {
     return formRedirect("invalid_request")
   }
@@ -422,6 +483,17 @@ export const onRequest = async (
   const botField = rawBotField?.trim() ?? ""
   if (botField.length > 0) {
     return redirect(SUCCESS_REDIRECT_URL, 303)
+  }
+
+  // 4.5 Turnstile bot check — verify the token via Cloudflare siteverify.
+  const remoteIp = request.headers.get("CF-Connecting-IP") ?? undefined
+  const turnstileResult = await verifyTurnstile(
+    env,
+    rawTurnstileToken,
+    remoteIp,
+  )
+  if (!turnstileResult.ok) {
+    return formRedirect("verification_failed")
   }
 
   // 5. Validate.

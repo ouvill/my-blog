@@ -1,9 +1,10 @@
 # Cloudflare Workers configuration
 # Docs: https://developers.cloudflare.com/workers/
 #
-# CONTACT_TO_EMAIL / CONTACT_FROM_EMAIL are Worker secrets, set via:
+# CONTACT_TO_EMAIL / CONTACT_FROM_EMAIL / TURNSTILE_SECRET_KEY are Worker secrets, set via:
 #   wrangler secret put CONTACT_TO_EMAIL
 #   wrangler secret put CONTACT_FROM_EMAIL
+#   wrangler secret put TURNSTILE_SECRET_KEY
 # Secrets survive `wrangler deploy`. Do NOT set them as plain-text variables
 # in the dashboard — those are deleted on every `wrangler deploy` because
 # this file does not declare them (and `keep_vars` is not enabled).
