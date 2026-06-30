@@ -7,6 +7,8 @@ interface StatusMessage {
   readonly body: string
 }
 
+const TURNSTILE_SITEKEY = import.meta.env.PUBLIC_TURNSTILE_SITEKEY
+
 const STATUS_MESSAGES: Record<string, StatusMessage> = {
   invalid_request: {
     type: "error",
@@ -22,6 +24,11 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
     type: "error",
     heading: "送信処理で問題が発生しました",
     body: "時間をおいて、もう一度送信してください。問題が続く場合は Twitter DM でお問い合わせください。",
+  },
+  verification_failed: {
+    type: "error",
+    heading: "送信前の確認に失敗しました",
+    body: "ボットでないことの確認に失敗しました。ページを再読み込みするか、確認にチェックを入れてから、もう一度送信してください。",
   },
 }
 ---
@@ -53,6 +60,12 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
         </div>
       ))
     }
+
+    <script
+      is:inline
+      src="https://challenges.cloudflare.com/turnstile/v0/api.js"
+      async
+      defer></script>
 
     <form method="POST" action="/api/contact" class="contact-form">
       <!-- Honeypot field: visually hidden, bots will fill it in -->
@@ -88,6 +101,13 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
         </label>
         <textarea id="field-context" name="context" rows="6" required
         ></textarea>
+      </div>
+
+      <div
+        class="cf-turnstile"
+        data-sitekey={TURNSTILE_SITEKEY}
+        data-action="turnstile-spin-v1"
+      >
       </div>
 
       <button type="submit" class="submit-button">送信する</button>
@@ -139,6 +159,13 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
         el.hidden = true
       }
     })
+
+    function resetTurnstile() {
+      const ts = (window as unknown as {
+        turnstile?: { reset: (widget?: string) => void }
+      }).turnstile
+      ts?.reset()
+    }
 
     function showStatus(key: string) {
       // Hide all first
@@ -200,8 +227,10 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
         const errorStatus =
           finalUrl.searchParams.get("status") ?? "server_error"
         showStatus(errorStatus)
+        resetTurnstile()
       } catch {
         showStatus("server_error")
+        resetTurnstile()
       } finally {
         setSubmitting(false)
       }
