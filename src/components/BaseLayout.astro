@@ -299,6 +299,55 @@ const pageTitle = `${title} | ${SITE_CONFIG.title}`
     border: 1px solid var(--color-border);
   }
 
+  .code-copy-wrapper {
+    position: relative;
+    margin: 1.5em 0;
+  }
+
+  .code-copy-wrapper pre {
+    margin: 0;
+    padding-right: 4.75rem;
+  }
+
+  .code-copy-button {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    min-width: 3.75rem;
+    height: 2rem;
+    padding: 0 0.65rem;
+    border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
+    border-radius: 6px;
+    color: var(--color-text-secondary);
+    background: color-mix(in srgb, var(--color-surface) 88%, transparent);
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.84;
+    transition:
+      background-color 160ms ease,
+      border-color 160ms ease,
+      color 160ms ease,
+      opacity 160ms ease;
+  }
+
+  .code-copy-button:hover,
+  .code-copy-button:focus-visible {
+    color: var(--color-accent);
+    background: var(--color-surface);
+    border-color: var(--color-accent);
+    opacity: 1;
+  }
+
+  .code-copy-button.is-copied {
+    color: var(--color-surface);
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    opacity: 1;
+  }
+
   .blog-content code,
   .page-content code {
     font-family: var(--font-mono);
@@ -374,6 +423,83 @@ const pageTitle = `${title} | ${SITE_CONFIG.title}`
     }
   }
 </style>
+
+<script>
+  const copiedLabel = "コピー済み"
+  const defaultLabel = "コピー"
+  const errorLabel = "失敗"
+
+  async function copyTextToClipboard(text: string) {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text)
+      return
+    }
+
+    const textarea = document.createElement("textarea")
+    textarea.value = text
+    textarea.setAttribute("readonly", "")
+    textarea.style.position = "fixed"
+    textarea.style.top = "0"
+    textarea.style.left = "-9999px"
+    document.body.append(textarea)
+    textarea.select()
+
+    try {
+      document.execCommand("copy")
+    } finally {
+      textarea.remove()
+    }
+  }
+
+  function setButtonLabel(button: HTMLButtonElement, label: string) {
+    button.textContent = label
+    button.setAttribute("aria-label", label)
+  }
+
+  function initCodeCopyButtons() {
+    const codeBlocks = document.querySelectorAll<HTMLPreElement>(
+      ".blog-content pre, .page-content pre"
+    )
+
+    codeBlocks.forEach((pre) => {
+      if (pre.parentElement?.classList.contains("code-copy-wrapper")) return
+
+      const wrapper = document.createElement("div")
+      wrapper.className = "code-copy-wrapper"
+      pre.before(wrapper)
+      wrapper.append(pre)
+
+      const button = document.createElement("button")
+      button.className = "code-copy-button"
+      button.type = "button"
+      setButtonLabel(button, defaultLabel)
+
+      let resetTimer: number | undefined
+      button.addEventListener("click", async () => {
+        window.clearTimeout(resetTimer)
+
+        try {
+          const code = pre.querySelector("code")
+          await copyTextToClipboard(code?.textContent ?? pre.textContent ?? "")
+          button.classList.add("is-copied")
+          setButtonLabel(button, copiedLabel)
+        } catch {
+          button.classList.remove("is-copied")
+          setButtonLabel(button, errorLabel)
+        }
+
+        resetTimer = window.setTimeout(() => {
+          button.classList.remove("is-copied")
+          setButtonLabel(button, defaultLabel)
+        }, 1800)
+      })
+
+      wrapper.append(button)
+    })
+  }
+
+  document.addEventListener("astro:page-load", initCodeCopyButtons)
+</script>
 
 <style>
   .root {
