@@ -1,0 +1,26 @@
+---
+import BaseLayout from "@components/BaseLayout.astro"
+import TaxonomyIndex from "@components/TaxonomyIndex.astro"
+import { getAllPosts } from "@lib/posts"
+import { SITE_CONFIG } from "@lib/site"
+import { collectTaxonomyItems } from "@lib/taxonomy"
+
+const posts = await getAllPosts()
+const tags = collectTaxonomyItems(posts, "tags")
+const title = "タグ一覧"
+const description = `${SITE_CONFIG.title} の記事タグ一覧です。関心のある技術やツールから記事を探せます。`
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalUrl={`${SITE_CONFIG.url}/tags/`}
+  image={`${SITE_CONFIG.url}/og-default.jpg`}
+>
+  <TaxonomyIndex
+    title={title}
+    description={description}
+    items={tags}
+    variant="tags"
+  />
+</BaseLayout>

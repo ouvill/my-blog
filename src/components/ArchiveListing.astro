@@ -1,0 +1,99 @@
+---
+import PostCard from "@components/PostCard.astro"
+import type { BlogPost } from "@lib/posts"
+
+export interface Props {
+  title: string
+  description: string
+  posts: BlogPost[]
+  backHref?: string
+  backLabel?: string
+}
+
+const {
+  title,
+  description,
+  posts,
+  backHref = "/",
+  backLabel = "トップへ戻る",
+} = Astro.props
+---
+
+<div class="archive-wrap">
+  <header class="archive-header">
+    <a href={backHref} class="back-link">{backLabel}</a>
+    <p class="archive-count">{posts.length} 件の記事</p>
+    <h1>{title}</h1>
+    <p>{description}</p>
+  </header>
+
+  <div class="post-grid">
+    {posts.map((post) => <PostCard post={post} />)}
+  </div>
+</div>
+
+<style>
+  .archive-wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 40px 16px 0;
+  }
+
+  .archive-header {
+    max-width: 720px;
+    margin-bottom: 28px;
+  }
+
+  .back-link {
+    display: inline-flex;
+    margin-bottom: 18px;
+    color: var(--color-support);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    color: var(--color-support-strong);
+  }
+
+  .archive-count {
+    margin: 0 0 8px;
+    color: var(--color-accent);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .archive-header h1 {
+    margin: 0;
+    color: var(--color-text);
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    line-height: 1.45;
+    font-feature-settings: "palt";
+  }
+
+  .archive-header p:last-child {
+    margin: 10px 0 0;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  .post-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 28px;
+  }
+
+  @media (max-width: 560px) {
+    .archive-wrap {
+      padding-top: 28px;
+    }
+
+    .archive-header h1 {
+      font-size: 1.55rem;
+    }
+  }
+</style>

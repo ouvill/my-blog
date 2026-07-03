@@ -29,6 +29,8 @@ const { isHome = false } = Astro.props
 
       <nav class="site-nav" aria-label="メインナビゲーション">
         <a href="/" class="nav-link">ブログ</a>
+        <a href="/categories/" class="nav-link">カテゴリ</a>
+        <a href="/tags/" class="nav-link">タグ</a>
         <a href="/contact/" class="nav-link">お問い合わせ</a>
         <button
           id="theme-toggle"
@@ -86,18 +88,22 @@ const { isHome = false } = Astro.props
   isHome && (
     <div class="hero">
       <div class="hero-inner">
-        <a href="/" class="hero-brand">
-          <img
-            src="/cherry-blossom.svg"
-            alt=""
-            width="40"
-            height="40"
-            class="hero-icon"
-          />
-          <span class="hero-title">{SITE_CONFIG.title}</span>
-        </a>
-        <p class="hero-description">{SITE_CONFIG.description}</p>
-        <p class="hero-tagline">技術メモと日常のあれこれを綴っています 🌸</p>
+        <div class="hero-copy">
+          <a href="/" class="hero-brand">
+            <img
+              src="/cherry-blossom.svg"
+              alt=""
+              width="40"
+              height="40"
+              class="hero-icon"
+            />
+            <span class="hero-title">{SITE_CONFIG.title}</span>
+          </a>
+          <p class="hero-description">{SITE_CONFIG.description}</p>
+          <p class="hero-tagline">
+            開発環境、Linux、Web 技術の試行錯誤を残す技術ログ。
+          </p>
+        </div>
       </div>
     </div>
   )
@@ -130,17 +136,13 @@ const { isHome = false } = Astro.props
   }
 
   .header-bar {
-    background: rgba(253, 250, 248, 0.82);
+    background: color-mix(in srgb, var(--color-bg) 86%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--color-border);
     height: 64px;
     display: flex;
     align-items: center;
-  }
-
-  :global([data-theme="dark"]) .header-bar {
-    background: rgba(28, 26, 30, 0.82);
   }
 
   .header-inner {
@@ -187,6 +189,7 @@ const { isHome = false } = Astro.props
     display: flex;
     align-items: center;
     gap: 4px;
+    min-width: 0;
   }
 
   .nav-link {
@@ -231,6 +234,34 @@ const { isHome = false } = Astro.props
     background: var(--color-accent-soft);
   }
 
+  @media (max-width: 560px) {
+    .header-inner {
+      padding: 0 10px;
+      gap: 8px;
+    }
+
+    .brand-name {
+      max-width: 7.5rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .site-nav {
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .site-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .nav-link {
+      padding: 8px;
+      font-size: 0.82rem;
+      white-space: nowrap;
+    }
+  }
+
   /* Show moon in light mode, sun in dark mode */
   .icon-sun {
     display: none;
@@ -250,19 +281,27 @@ const { isHome = false } = Astro.props
 
   /* ---- Hero section ---- */
   .hero {
-    background: radial-gradient(
-      ellipse at 50% 0%,
-      var(--color-accent-soft) 0%,
-      transparent 70%
-    );
+    position: relative;
+    min-height: 300px;
     padding: 64px 16px 56px;
     border-bottom: 1px solid var(--color-border);
+    background:
+      linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--color-bg) 96%, transparent) 0%,
+        color-mix(in srgb, var(--color-bg) 90%, transparent) 56%,
+        color-mix(in srgb, var(--color-bg) 58%, transparent) 100%
+      ),
+      url("/hero-home-wide.jpg") center / cover no-repeat;
   }
 
   .hero-inner {
-    max-width: 640px;
+    max-width: 1080px;
     margin: 0 auto;
-    text-align: center;
+  }
+
+  .hero-copy {
+    max-width: 620px;
   }
 
   .hero-brand {
@@ -271,7 +310,7 @@ const { isHome = false } = Astro.props
     gap: 12px;
     text-decoration: none;
     color: var(--color-text);
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
 
   .hero-brand:hover .hero-title {
@@ -286,7 +325,7 @@ const { isHome = false } = Astro.props
   .hero-title {
     font-family: var(--font-heading);
     font-weight: 700;
-    font-size: 2rem;
+    font-size: 2.15rem;
     font-feature-settings: "palt";
     color: var(--color-text);
     transition: color 200ms ease;
@@ -299,16 +338,35 @@ const { isHome = false } = Astro.props
   }
 
   .hero-description {
-    margin: 0 0 10px;
-    font-size: 1rem;
+    margin: 0 0 12px;
+    font-size: 1.1rem;
     color: var(--color-text-secondary);
     font-weight: 600;
   }
 
   .hero-tagline {
     margin: 0;
-    font-size: 0.9375rem;
+    max-width: 34rem;
+    font-size: 0.975rem;
     color: var(--color-text-muted);
     line-height: 1.7;
+  }
+
+  @media (max-width: 640px) {
+    .hero {
+      min-height: 250px;
+      padding: 44px 16px 40px;
+      background:
+        linear-gradient(
+          180deg,
+          color-mix(in srgb, var(--color-bg) 95%, transparent) 0%,
+          color-mix(in srgb, var(--color-bg) 92%, transparent) 100%
+        ),
+        url("/hero-home-wide.jpg") center / cover no-repeat;
+    }
+
+    .hero-title {
+      font-size: 1.8rem;
+    }
   }
 </style>

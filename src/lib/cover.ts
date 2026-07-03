@@ -16,21 +16,35 @@ const blogImages: Record<string, ImageModule> = import.meta.glob(
 
 /**
  * Standard default cover image URL (served from public/).
- * This file exists at public/site-header.jpg and will be copied verbatim.
+ * This file exists at public/default-cover-card.jpg and will be copied verbatim.
  */
-export const DEFAULT_COVER = "/site-header.jpg"
+export const DEFAULT_COVER = "/default-cover-card.jpg"
 
 /**
- * Given a post's entry ID (e.g. "2018-11-27-gitlab_gitbook/index.md"),
- * return the project-root absolute directory path for the post.
+ * Return the project-root absolute directory path for the post.
  *
- * @example
- *   getPostDir("2018-11-27-gitlab_gitbook/index.md")
- *   // => "/src/content/blog/2018-11-27-gitlab_gitbook/"
+ * Astro's glob loader exposes entry IDs without file extensions for index
+ * posts, so prefer `filePath` when available and keep an ID-based fallback for
+ * compatibility with older generated types.
  */
-function getPostDir(entryId: string): string {
+function getPostDir(post: CollectionEntry<"blog">): string {
+  const normalizedFilePath = post.filePath?.replaceAll("\\", "/")
+  const contentPathPrefix = "src/content/blog/"
+
+  if (normalizedFilePath?.startsWith(contentPathPrefix)) {
+    const slashIndex = normalizedFilePath.lastIndexOf("/")
+    return `/${normalizedFilePath.slice(0, slashIndex + 1)}`
+  }
+
+  const entryId = post.id.replace(/\.mdx?$/, "")
   const slashIndex = entryId.lastIndexOf("/")
-  const dir = slashIndex >= 0 ? entryId.slice(0, slashIndex + 1) : ""
+  const dir =
+    slashIndex >= 0
+      ? entryId.slice(0, slashIndex + 1)
+      : entryId.length > 0
+        ? `${entryId}/`
+        : ""
+
   return `/src/content/blog/${dir}`
 }
 
@@ -53,7 +67,7 @@ const FALLBACK_COVERS = ["thumb.jpg", "cover.jpg", "cover.png"]
 export function resolveCoverOrNull(
   post: CollectionEntry<"blog">
 ): string | null {
-  const postDir = getPostDir(post.id)
+  const postDir = getPostDir(post)
   const rawCover = post.data.cover
 
   // Try the specified cover path first
@@ -84,7 +98,7 @@ export function resolveCoverOrNull(
 /**
  * Resolve the frontmatter `cover` string to a built asset URL string.
  *
- * @returns An absolute URL path (e.g., "/_astro/cover.hash.png" or "/site-header.jpg").
+ * @returns An absolute URL path (e.g., "/_astro/cover.hash.png" or "/default-cover-card.jpg").
  */
 export function resolveCover(post: CollectionEntry<"blog">): string {
   return resolveCoverOrNull(post) ?? DEFAULT_COVER
