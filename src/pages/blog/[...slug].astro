@@ -43,7 +43,7 @@ const canonicalUrl = `${SITE_CONFIG.url}${blogUrlPath(fullSlug)}`
 const realCover = resolveCoverOrNull(post)
 const ogImage = realCover
   ? `${SITE_CONFIG.url}${realCover}`
-  : `${SITE_CONFIG.url}/og/${fullSlug}.png`
+  : `${SITE_CONFIG.url}/og/${fullSlug}.png/`
 
 const dateStr = post.data.date.toLocaleDateString("ja-JP", {
   year: "numeric",
