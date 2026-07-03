@@ -1,5 +1,7 @@
 ---
 import { SITE_CONFIG } from "@lib/site"
+
+const twitterUrl = `https://twitter.com/${SITE_CONFIG.twitter}`
 ---
 
 <div class="bio">
@@ -12,16 +14,16 @@ import { SITE_CONFIG } from "@lib/site"
   />
   <div class="bio-text">
     <p>
-      この記事は{
-        SITE_CONFIG.author
-      }が書きました。IT関連の記事執筆やサイト作成や、ウェブアプリケーション開発の業務委託などのご依頼を賜っております。
+      この記事は{SITE_CONFIG.author}が書きました。IT
+      関連の記事執筆、サイト制作、Web
+      アプリケーション開発の業務委託などのご依頼を賜っております。
     </p>
     <p>
       ご要件がある方は<a href="/contact/">コンタクトフォーム</a
       >からご連絡ください。
     </p>
     <p>
-      <a href="https://twitter.com/{SITE_CONFIG.twitter}">
+      <a href={twitterUrl} target="_blank" rel="noopener noreferrer">
         @{SITE_CONFIG.twitter}
       </a>
     </p>

@@ -1,0 +1,48 @@
+---
+import ArchiveListing from "@components/ArchiveListing.astro"
+import BaseLayout from "@components/BaseLayout.astro"
+import { getAllPosts } from "@lib/posts"
+import { SITE_CONFIG } from "@lib/site"
+import {
+  collectTaxonomyRouteNames,
+  decodeTaxonomyParam,
+  filterPostsByTaxonomy,
+  normalizeTagName,
+} from "@lib/taxonomy"
+
+export interface Params {
+  tag: string
+}
+
+export async function getStaticPaths() {
+  const posts = await getAllPosts()
+  return collectTaxonomyRouteNames(posts, "tags").map((tag) => ({
+    params: { tag },
+  }))
+}
+
+const posts = await getAllPosts()
+const tag = normalizeTagName(decodeTaxonomyParam(Astro.params.tag))
+const filteredPosts = filterPostsByTaxonomy(posts, "tags", tag)
+
+if (filteredPosts.length === 0) {
+  return Astro.redirect("/404", 404)
+}
+
+const title = `#${tag} の記事`
+const description = `${SITE_CONFIG.title} の「${tag}」タグが付いた記事一覧です。`
+const canonicalUrl = `${SITE_CONFIG.url}/tags/${encodeURIComponent(tag)}/`
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalUrl={canonicalUrl}
+  image={`${SITE_CONFIG.url}/og-default.jpg`}
+>
+  <ArchiveListing
+    title={title}
+    description={description}
+    posts={filteredPosts}
+  />
+</BaseLayout>

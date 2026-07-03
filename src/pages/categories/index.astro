@@ -1,0 +1,26 @@
+---
+import BaseLayout from "@components/BaseLayout.astro"
+import TaxonomyIndex from "@components/TaxonomyIndex.astro"
+import { getAllPosts } from "@lib/posts"
+import { SITE_CONFIG } from "@lib/site"
+import { collectTaxonomyItems } from "@lib/taxonomy"
+
+const posts = await getAllPosts()
+const categories = collectTaxonomyItems(posts, "categories")
+const title = "カテゴリ一覧"
+const description = `${SITE_CONFIG.title} の記事カテゴリ一覧です。大きなテーマから記事を探せます。`
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalUrl={`${SITE_CONFIG.url}/categories/`}
+  image={`${SITE_CONFIG.url}/og-default.jpg`}
+>
+  <TaxonomyIndex
+    title={title}
+    description={description}
+    items={categories}
+    variant="categories"
+  />
+</BaseLayout>

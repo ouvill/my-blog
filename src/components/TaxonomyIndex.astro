@@ -1,0 +1,143 @@
+---
+import type { TaxonomyItem } from "@lib/taxonomy"
+
+export interface Props {
+  title: string
+  description: string
+  items: TaxonomyItem[]
+  variant: "categories" | "tags"
+}
+
+const { title, description, items, variant } = Astro.props
+---
+
+<div class="taxonomy-index">
+  <header class="taxonomy-header">
+    <a href="/" class="back-link">トップへ戻る</a>
+    <p>{variant === "categories" ? "Categories" : "Tags"}</p>
+    <h1>{title}</h1>
+    <span>{description}</span>
+  </header>
+
+  <div class:list={["taxonomy-grid", `taxonomy-grid--${variant}`]}>
+    {
+      items.map((item) => (
+        <a href={item.href} class="taxonomy-card">
+          <span class="taxonomy-name">{item.name}</span>
+          <span class="taxonomy-count">{item.count} 件</span>
+        </a>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .taxonomy-index {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 40px 16px 0;
+  }
+
+  .taxonomy-header {
+    max-width: 720px;
+    margin-bottom: 28px;
+  }
+
+  .back-link {
+    display: inline-flex;
+    margin-bottom: 18px;
+    color: var(--color-support);
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    color: var(--color-support-strong);
+  }
+
+  .taxonomy-header p {
+    margin: 0 0 8px;
+    color: var(--color-accent);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .taxonomy-header h1 {
+    margin: 0;
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    line-height: 1.45;
+    font-feature-settings: "palt";
+  }
+
+  .taxonomy-header span {
+    display: block;
+    margin-top: 10px;
+    color: var(--color-text-secondary);
+    line-height: 1.8;
+  }
+
+  .taxonomy-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .taxonomy-grid--categories {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+
+  .taxonomy-grid--tags {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+
+  .taxonomy-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    min-height: 58px;
+    padding: 14px 16px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    text-decoration: none;
+    box-shadow: var(--shadow-card);
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
+  }
+
+  .taxonomy-card:hover {
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-card-hover);
+    transform: translateY(-2px);
+  }
+
+  .taxonomy-name {
+    font-weight: 800;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  .taxonomy-count {
+    flex: 0 0 auto;
+    color: var(--color-text-muted);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  @media (max-width: 560px) {
+    .taxonomy-index {
+      padding-top: 28px;
+    }
+
+    .taxonomy-header h1 {
+      font-size: 1.55rem;
+    }
+  }
+</style>

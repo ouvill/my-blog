@@ -6,6 +6,12 @@ import { getAllPosts } from "@lib/posts"
 import { blogEntryIdToSlug, blogUrlPath } from "@lib/slug"
 import { SITE_CONFIG } from "@lib/site"
 import { resolveCoverOrNull } from "@lib/cover"
+import {
+  getPostCategory,
+  getPostTags,
+  getRelatedPosts,
+  taxonomyPath,
+} from "@lib/taxonomy"
 import type { MarkdownHeading } from "astro"
 import { render } from "astro:content"
 
@@ -51,8 +57,8 @@ const dateStr = post.data.date.toLocaleDateString("ja-JP", {
   day: "numeric",
 })
 
-// Collect unified tags (support both `tags` and legacy `tag` fields)
-const allTags = [...(post.data.tags ?? []), ...(post.data.tag ?? [])]
+const allTags = getPostTags(post)
+const category = getPostCategory(post)
 
 // Previous/next posts
 const currentIndex = posts.findIndex(
@@ -62,10 +68,7 @@ const prevPost =
   currentIndex < posts.length - 1 ? posts[currentIndex + 1] : null
 const nextPost = currentIndex > 0 ? posts[currentIndex - 1] : null
 
-// Recent posts (3 latest, excluding current)
-const recentPosts = posts
-  .filter((p) => blogEntryIdToSlug(p.id) !== fullSlug)
-  .slice(0, 3)
+const relatedPosts = getRelatedPosts(posts, post, 4)
 ---
 
 <BaseLayout
@@ -82,10 +85,22 @@ const recentPosts = posts
             {dateStr}
           </time>
           {
+            category && (
+              <a
+                href={taxonomyPath("categories", category)}
+                class="blog-category"
+              >
+                {category}
+              </a>
+            )
+          }
+          {
             allTags.length > 0 && (
               <div class="blog-tags">
                 {allTags.map((tag) => (
-                  <span class="tag">{tag}</span>
+                  <a href={taxonomyPath("tags", tag)} class="tag">
+                    {tag}
+                  </a>
                 ))}
               </div>
             )
@@ -151,18 +166,51 @@ const recentPosts = posts
         </nav>
 
         {
-          recentPosts.length > 0 && (
-            <section class="recent-posts">
-              <h3 class="recent-title">最新記事</h3>
-              <ul class="recent-list">
-                {recentPosts.map((rp) => (
-                  <li class="recent-item">
-                    <a href={blogUrlPath(blogEntryIdToSlug(rp.id))}>
-                      {rp.data.title}
+          relatedPosts.length > 0 && (
+            <section class="related-posts">
+              <div class="related-header">
+                <p>Related Posts</p>
+                <h3>関連記事</h3>
+              </div>
+              <div class="related-list">
+                {relatedPosts.map((related) => {
+                  const relatedSlug = blogEntryIdToSlug(related.post.id)
+                  const relatedDate = related.post.data.date.toLocaleDateString(
+                    "ja-JP",
+                    {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    }
+                  )
+                  const relatedLabels =
+                    related.matchedTags.length > 0
+                      ? related.matchedTags
+                      : related.matchedCategory
+                        ? [related.matchedCategory]
+                        : []
+
+                  return (
+                    <a
+                      href={blogUrlPath(relatedSlug)}
+                      class="related-card"
+                      aria-label={`${related.post.data.title} を読む`}
+                    >
+                      <span class="related-date">{relatedDate}</span>
+                      <span class="related-title">
+                        {related.post.data.title}
+                      </span>
+                      {relatedLabels.length > 0 && (
+                        <span class="related-labels">
+                          {relatedLabels.slice(0, 3).map((label) => (
+                            <span>{label}</span>
+                          ))}
+                        </span>
+                      )}
                     </a>
-                  </li>
-                ))}
-              </ul>
+                  )
+                })}
+              </div>
             </section>
           )
         }
@@ -374,10 +422,27 @@ const recentPosts = posts
   }
 
   .blog-date {
-    display: block;
+    display: inline-block;
     color: var(--color-text-muted);
     font-size: 0.875rem;
     margin-bottom: 8px;
+  }
+
+  .blog-category {
+    display: inline-flex;
+    margin-left: 10px;
+    padding: 2px 10px;
+    border-radius: 9999px;
+    background: var(--color-support-soft);
+    color: var(--color-support);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.6;
+    text-decoration: none;
+  }
+
+  .blog-category:hover {
+    color: var(--color-support-strong);
   }
 
   .blog-tags {
@@ -394,6 +459,11 @@ const recentPosts = posts
     border-radius: 9999px;
     font-size: 0.75rem;
     font-weight: 500;
+    text-decoration: none;
+  }
+
+  .blog-tags .tag:hover {
+    color: var(--color-accent-strong);
   }
 
   .blog-title {
@@ -522,57 +592,100 @@ const recentPosts = posts
     color: var(--color-accent);
   }
 
-  /* ---- Recent posts ---- */
-  .recent-posts {
+  /* ---- Related posts ---- */
+  .related-posts {
     margin-top: 28px;
+    padding: 18px;
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    background: var(--color-surface-raised);
   }
 
-  .recent-title {
-    font-size: 1rem;
+  .related-header {
+    margin-bottom: 12px;
+  }
+
+  .related-header p {
+    margin: 0 0 2px;
+    color: var(--color-support);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .related-header h3 {
+    margin: 0;
+    color: var(--color-text);
     font-family: var(--font-heading);
-    font-weight: 700;
-    margin: 0 0 12px;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .related-list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .related-card {
+    display: grid;
+    gap: 4px;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    text-decoration: none;
+    transition:
+      border-color 180ms ease,
+      background-color 180ms ease,
+      color 180ms ease;
+  }
+
+  .related-card:hover {
+    border-color: color-mix(
+      in srgb,
+      var(--color-accent) 36%,
+      var(--color-border)
+    );
+    background: color-mix(
+      in srgb,
+      var(--color-accent-soft) 42%,
+      var(--color-surface)
+    );
     color: var(--color-text);
   }
 
-  .recent-list {
-    padding: 0;
-    margin: 0;
-    list-style: none;
+  .related-date {
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+    font-weight: 700;
   }
 
-  .recent-item {
+  .related-title {
+    color: var(--color-text);
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1.55;
+  }
+
+  .related-card:hover .related-title {
+    color: var(--color-accent);
+  }
+
+  .related-labels {
     display: flex;
-    align-items: baseline;
-    gap: 8px;
-    padding: 6px 0;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .recent-item:last-child {
-    border-bottom: none;
-  }
-
-  .recent-item::before {
-    content: "";
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--color-accent);
-    flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 5px;
     margin-top: 2px;
   }
 
-  .recent-item a {
-    text-decoration: none;
-    color: var(--color-text-secondary);
-    font-size: 0.9rem;
-    line-height: 1.5;
-    transition: color 150ms ease;
-  }
-
-  .recent-item a:hover {
+  .related-labels span {
+    padding: 1px 8px;
+    border-radius: 9999px;
+    background: var(--color-accent-soft);
     color: var(--color-accent);
+    font-size: 0.72rem;
+    font-weight: 700;
   }
 </style>

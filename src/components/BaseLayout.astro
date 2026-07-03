@@ -92,17 +92,21 @@ const pageTitle = `${title} | ${SITE_CONFIG.title}`
   :root {
     --color-bg: #fdfaf8;
     --color-surface: #ffffff;
+    --color-surface-raised: #fffafc;
     --color-text: #3a3335;
-    --color-text-secondary: #6b6266;
+    --color-text-secondary: #6d6267;
     --color-text-muted: #9a8f93;
-    --color-accent: #c4536f;
-    --color-accent-strong: #a83f5b;
-    --color-accent-soft: #faeef1;
+    --color-accent: #c75f7a;
+    --color-accent-strong: #a94964;
+    --color-accent-soft: #faeef2;
+    --color-support: #8a6f7b;
+    --color-support-strong: #6f5662;
+    --color-support-soft: #f4eef1;
     --color-border: #ece4e1;
     --shadow-card:
-      0 1px 2px rgba(90, 60, 70, 0.06), 0 4px 16px rgba(90, 60, 70, 0.08);
+      0 1px 2px rgba(90, 60, 70, 0.04), 0 8px 22px rgba(90, 60, 70, 0.07);
     --shadow-card-hover:
-      0 2px 4px rgba(90, 60, 70, 0.08), 0 12px 32px rgba(90, 60, 70, 0.14);
+      0 2px 4px rgba(90, 60, 70, 0.06), 0 16px 34px rgba(90, 60, 70, 0.1);
     --font-sans:
       "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Noto Sans CJK JP",
       "メイリオ", Meiryo, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -117,15 +121,19 @@ const pageTitle = `${title} | ${SITE_CONFIG.title}`
 
   /* ---- Design tokens: Dark theme ---- */
   [data-theme="dark"] {
-    --color-bg: #1c1a1e;
-    --color-surface: #26232a;
+    --color-bg: #1d1a1e;
+    --color-surface: #28232a;
+    --color-surface-raised: #302931;
     --color-text: #ece7e9;
-    --color-text-secondary: #b5aab0;
-    --color-text-muted: #8a7f85;
-    --color-accent: #e08aa0;
-    --color-accent-strong: #eba6b8;
-    --color-accent-soft: rgba(224, 138, 160, 0.14);
-    --color-border: #3a353d;
+    --color-text-secondary: #b9adb3;
+    --color-text-muted: #90848a;
+    --color-accent: #e795aa;
+    --color-accent-strong: #f3b0c0;
+    --color-accent-soft: rgba(231, 149, 170, 0.15);
+    --color-support: #c5aeb9;
+    --color-support-strong: #ddc7d2;
+    --color-support-soft: rgba(197, 174, 185, 0.13);
+    --color-border: #3d363d;
     --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.2), 0 4px 16px rgba(0, 0, 0, 0.25);
     --shadow-card-hover:
       0 2px 4px rgba(0, 0, 0, 0.25), 0 12px 32px rgba(0, 0, 0, 0.4);
