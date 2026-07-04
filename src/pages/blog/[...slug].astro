@@ -76,6 +76,7 @@ const relatedPosts = getRelatedPosts(posts, post, 4)
   description={post.data.description ?? undefined}
   image={ogImage}
   canonicalUrl={canonicalUrl}
+  mainClass="blog-post-shell"
 >
   <div class="blog-layout">
     <article class="blog-main">
@@ -319,18 +320,22 @@ const relatedPosts = getRelatedPosts(posts, post, 4)
 
 <style>
   .blog-layout {
-    display: flex;
-    gap: 24px;
+    --blog-main-width: 720px;
+    --blog-toc-width: 240px;
+    --blog-layout-gap: 24px;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     align-items: flex-start;
-    max-width: 1080px;
+    max-width: var(--blog-main-width);
     margin: 0 auto;
+    width: 100%;
   }
 
   .blog-main {
-    flex: 1;
     min-width: 0;
-    max-width: 720px;
-    margin: 0 auto;
+    max-width: var(--blog-main-width);
+    width: 100%;
   }
 
   /* Sidebar TOC — hidden on smaller screens */
@@ -340,12 +345,30 @@ const relatedPosts = getRelatedPosts(posts, post, 4)
     flex-shrink: 0;
   }
 
-  @media (min-width: 1024px) {
-    .blog-main {
-      margin: 0;
+  @media (min-width: 1280px) {
+    :global(main.blog-post-shell) {
+      max-width: 1280px;
     }
+
+    .blog-layout {
+      grid-template-columns:
+        minmax(0, var(--blog-toc-width))
+        minmax(0, var(--blog-main-width))
+        var(--blog-toc-width);
+      gap: var(--blog-layout-gap);
+      max-width: calc(
+        var(--blog-main-width) + var(--blog-toc-width) + var(--blog-toc-width) +
+          var(--blog-layout-gap) + var(--blog-layout-gap)
+      );
+    }
+
+    .blog-main {
+      grid-column: 2;
+    }
+
     .sidebar-toc {
       display: block;
+      grid-column: 3;
       /* Stretch to the full row height so the sticky card can engage */
       align-self: stretch;
     }
@@ -482,7 +505,7 @@ const relatedPosts = getRelatedPosts(posts, post, 4)
     }
   }
 
-  /* ---- Inline TOC (shown on smaller screens, hidden on ≥1024px) ---- */
+  /* ---- Inline TOC (shown on smaller screens, hidden on wide screens) ---- */
   .toc-inline {
     background: var(--color-accent-soft);
     border-radius: 12px;
@@ -491,7 +514,7 @@ const relatedPosts = getRelatedPosts(posts, post, 4)
     border: 1px solid var(--color-border);
   }
 
-  @media (min-width: 1024px) {
+  @media (min-width: 1280px) {
     .toc-inline {
       display: none;
     }
