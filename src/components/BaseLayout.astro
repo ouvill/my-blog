@@ -13,6 +13,8 @@ export interface Props {
   }
   /** Whether to show the full "home" header */
   isHome?: boolean
+  /** Optional class for page-specific main layout adjustments */
+  mainClass?: string
   /** The canonical URL for this page (used for SEO) */
   canonicalUrl?: string
   /** If true, emit `<meta name="robots" content="noindex, nofollow" />` */
@@ -25,6 +27,7 @@ const {
   image,
   article,
   isHome = false,
+  mainClass,
   canonicalUrl,
   noindex = false,
 } = Astro.props
@@ -128,7 +131,7 @@ const serializedArticleJsonLd = articleJsonLd
     <div class="root">
       <div class="content">
         <Header isHome={isHome} />
-        <main>
+        <main class={mainClass}>
           <slot />
         </main>
         <Footer />
