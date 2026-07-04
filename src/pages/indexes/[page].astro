@@ -15,7 +15,7 @@ export async function getStaticPaths() {
   const allPosts = await getAllPosts()
   const total = Math.max(1, Math.ceil(allPosts.length / POSTS_PER_PAGE))
   const paths = []
-  for (let i = 0; i < total; i++) {
+  for (let i = 1; i < total; i++) {
     paths.push({ params: { page: String(i) } })
   }
   return paths
@@ -27,12 +27,17 @@ const pageNum = parseInt(page ?? "0", 10)
 const allPosts = await getAllPosts()
 const pagination = getPaginationInfo(allPosts.length, pageNum)
 const pagePosts = getPageSlice(allPosts, pageNum)
+const canonicalUrl =
+  pageNum === 0
+    ? `${SITE_CONFIG.url}/`
+    : `${SITE_CONFIG.url}/indexes/${pageNum}/`
 ---
 
 <BaseLayout
   title={`${SITE_CONFIG.title} — ${pageNum + 1}ページ目`}
   isHome={true}
   image={defaultOgImage}
+  canonicalUrl={canonicalUrl}
 >
   <div class="index-wrap">
     <div class="post-grid">

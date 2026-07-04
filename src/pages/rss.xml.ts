@@ -1,4 +1,5 @@
 import rss from "@astrojs/rss"
+import { descriptionOrExcerpt } from "@lib/excerpt"
 import { getAllPosts } from "@lib/posts"
 import { blogEntryIdToSlug, blogUrlPath } from "@lib/slug"
 import { SITE_CONFIG } from "@lib/site"
@@ -12,7 +13,7 @@ export async function GET() {
     items: posts.map((post) => ({
       title: post.data.title,
       pubDate: post.data.date,
-      description: post.data.description ?? post.data.subTitle ?? undefined,
+      description: descriptionOrExcerpt(post.data.description, post.body),
       link: `${SITE_CONFIG.url}${blogUrlPath(blogEntryIdToSlug(post.id))}`,
     })),
   })

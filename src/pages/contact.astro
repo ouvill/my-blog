@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@components/BaseLayout.astro"
+import { SITE_CONFIG } from "@lib/site"
 
 interface StatusMessage {
   readonly type: "error" | "info"
@@ -33,7 +34,7 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
 }
 ---
 
-<BaseLayout title="お問い合わせ">
+<BaseLayout title="お問い合わせ" canonicalUrl={`${SITE_CONFIG.url}/contact/`}>
   <div class="contact-page">
     <h1 class="contact-heading">お問い合わせ</h1>
 
@@ -161,9 +162,11 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
     })
 
     function resetTurnstile() {
-      const ts = (window as unknown as {
-        turnstile?: { reset: (widget?: string) => void }
-      }).turnstile
+      const ts = (
+        window as unknown as {
+          turnstile?: { reset: (widget?: string) => void }
+        }
+      ).turnstile
       ts?.reset()
     }
 
@@ -237,8 +240,7 @@ const STATUS_MESSAGES: Record<string, StatusMessage> = {
     })
   }
 
-  // Run on initial load and after each view-transition navigation
-  document.addEventListener("astro:page-load", initContactPage)
+  initContactPage()
 </script>
 
 <style>

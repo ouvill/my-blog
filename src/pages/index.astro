@@ -11,23 +11,8 @@ import {
   taxonomyPath,
 } from "@lib/taxonomy"
 import { blogEntryIdToSlug, blogUrlPath } from "@lib/slug"
-import { resolveCoverOrNull } from "@lib/cover"
-
-const toExcerpt = (body: string, maxLength = 118) => {
-  const text = body
-    .replace(/```[\s\S]*?```/g, "")
-    .replace(/!\[[^\]]*\]\([^)]+\)/g, "")
-    .replace(/\[[^\]]+\]\([^)]+\)/g, "")
-    .replace(/[#>*_`-]/g, "")
-    .replace(/\s+/g, " ")
-    .trim()
-
-  if (text.length <= maxLength) {
-    return text
-  }
-
-  return `${text.slice(0, maxLength).trimEnd()}...`
-}
+import { resolveCoverImageOrNull } from "@lib/cover"
+import { descriptionOrExcerpt } from "@lib/excerpt"
 
 const allPosts = await getAllPosts()
 const pagination = getPaginationInfo(allPosts.length, 0)
@@ -35,11 +20,13 @@ const pagePosts = getPageSlice(allPosts, 0)
 const defaultOgImage = `${SITE_CONFIG.url}/og-default.jpg`
 const featuredPost = allPosts[0]
 const featuredSlug = featuredPost ? blogEntryIdToSlug(featuredPost.id) : null
-const featuredCoverUrl = featuredPost ? resolveCoverOrNull(featuredPost) : null
+const featuredCover = featuredPost
+  ? resolveCoverImageOrNull(featuredPost)
+  : null
 const featuredTags = featuredPost ? getPostTags(featuredPost).slice(0, 3) : []
 const featuredCategory = featuredPost ? getPostCategory(featuredPost) : null
 const featuredExcerpt = featuredPost
-  ? (featuredPost.data.description ?? toExcerpt(featuredPost.body))
+  ? descriptionOrExcerpt(featuredPost.data.description, featuredPost.body)
   : null
 const allCategories = collectTaxonomyItems(allPosts, "categories")
 const categories = allCategories.slice(0, 8)
@@ -47,22 +34,27 @@ const tags = collectTaxonomyItems(allPosts, "tags").slice(0, 12)
 const years = new Set(allPosts.map((post) => post.data.date.getFullYear()))
 ---
 
-<BaseLayout title={SITE_CONFIG.title} isHome={true} image={defaultOgImage}>
+<BaseLayout
+  title={SITE_CONFIG.title}
+  isHome={true}
+  image={defaultOgImage}
+  canonicalUrl={`${SITE_CONFIG.url}/`}
+>
   <div class="index-wrap">
     <section class="home-overview" aria-label="ブログ概要">
       {
         featuredPost && featuredSlug && (
           <article
-            class={`featured-post${featuredCoverUrl ? "" : " featured-post--text-only"}`}
+            class={`featured-post${featuredCover ? "" : " featured-post--text-only"}`}
           >
-            {featuredCoverUrl && (
+            {featuredCover && (
               <a href={blogUrlPath(featuredSlug)} class="featured-cover">
                 <img
-                  src={featuredCoverUrl}
+                  src={featuredCover.src}
                   alt=""
                   loading="eager"
-                  width="720"
-                  height="405"
+                  width={featuredCover.width}
+                  height={featuredCover.height}
                 />
               </a>
             )}

@@ -1,7 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content"
 import { blogEntryIdToSlug, blogUrlPath } from "@lib/slug"
-import { resolveCoverOrNull } from "@lib/cover"
+import { resolveCoverImageOrNull } from "@lib/cover"
 import { getPostCategory, getPostTags, taxonomyPath } from "@lib/taxonomy"
 
 export interface Props {
@@ -18,10 +18,10 @@ const dateStr = post.data.date.toLocaleDateString("ja-JP", {
 })
 const allTags = getPostTags(post)
 const category = getPostCategory(post)
-const coverUrl = resolveCoverOrNull(post)
+const cover = resolveCoverImageOrNull(post)
 ---
 
-<article class={`post-card${coverUrl ? " post-card--with-cover" : ""}`}>
+<article class={`post-card${cover ? " post-card--with-cover" : ""}`}>
   <a
     href={href}
     class="post-card-hit-area"
@@ -70,10 +70,17 @@ const coverUrl = resolveCoverOrNull(post)
     }
   </div>
   {
-    coverUrl && (
+    cover && (
       <a href={href} class="post-card-cover-link" aria-label={post.data.title}>
         <div class="post-card-cover">
-          <img src={coverUrl} alt="" loading="lazy" class="cover-image" />
+          <img
+            src={cover.src}
+            alt=""
+            loading="lazy"
+            width={cover.width}
+            height={cover.height}
+            class="cover-image"
+          />
         </div>
       </a>
     )
