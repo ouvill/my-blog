@@ -322,11 +322,14 @@ const description = descriptionOrExcerpt(post.data.description, post.body)
 </script>
 
 <style>
-  .blog-layout {
+  :global(main.blog-post-shell) {
     --blog-main-width: 800px;
     --blog-toc-width: 240px;
     --blog-layout-gap: 24px;
+    --blog-shell-inline-padding: 32px;
+  }
 
+  .blog-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     align-items: flex-start;
@@ -344,17 +347,18 @@ const description = descriptionOrExcerpt(post.data.description, post.body)
   /* Sidebar TOC — hidden on smaller screens */
   .sidebar-toc {
     display: none;
-    width: 240px;
+    width: var(--blog-toc-width);
     flex-shrink: 0;
   }
 
   @media (min-width: 1440px) {
-    :global(main.blog-post-shell) {
-      max-width: calc(
-        var(--blog-main-width) + var(--blog-toc-width) + var(--blog-toc-width) +
-          var(--blog-layout-gap) + var(--blog-layout-gap) + 32px
-      );
-    }
+      :global(body main.blog-post-shell) {
+        max-width: calc(
+          var(--blog-main-width) + var(--blog-toc-width) + var(--blog-toc-width) +
+            var(--blog-layout-gap) + var(--blog-layout-gap) +
+            var(--blog-shell-inline-padding)
+        );
+      }
 
     .blog-layout {
       grid-template-columns:
