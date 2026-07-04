@@ -2,7 +2,7 @@
 
 ## Project facts
 
-- This is a Japanese-language technical blog (blog.ouvill.net) built on **Astro v5**.
+- This is a Japanese-language technical blog (blog.ouvill.net) built on **Astro v7**.
 - Author GitHub: `Ouvill` / repo: `Ouvill/gatsbyjs_blog`.
 - Lockfile is **package-lock.json** only; no yarn.lock exists.
 - CI workflow (`.github/workflows/node.js.yml`) runs `npm ci`, `npm run typecheck`, `npm run build` on push/PR to master with Node 22.

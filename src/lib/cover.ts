@@ -5,6 +5,12 @@ interface ImageModule {
   default: { src: string; width: number; height: number; format: string }
 }
 
+export interface CoverImage {
+  src: string
+  width: number
+  height: number
+}
+
 /**
  * All image files under src/content/blog/, keyed by their absolute path
  * from the project root (e.g., "/src/content/blog/2022-10-18-cover/cover.png").
@@ -52,8 +58,8 @@ function getPostDir(post: CollectionEntry<"blog">): string {
 const FALLBACK_COVERS = ["thumb.jpg", "cover.jpg", "cover.png"]
 
 /**
- * Resolve the frontmatter `cover` to a built asset URL string, or return
- * `null` if no real cover image is found (i.e. this post has no cover).
+ * Resolve the frontmatter `cover` to a built asset URL with dimensions, or
+ * return `null` if no real cover image is found (i.e. this post has no cover).
  *
  * The algorithm:
  * 1. If `cover` is empty/null/undefined, skip to fallbacks.
@@ -62,11 +68,11 @@ const FALLBACK_COVERS = ["thumb.jpg", "cover.jpg", "cover.png"]
  * 3. If not found in glob, also try fallback filenames (thumb.jpg, etc.).
  * 4. If nothing matches, return null.
  *
- * @returns An absolute URL path (e.g., "/_astro/cover.hash.png") or null.
+ * @returns Image metadata with an absolute URL path (e.g., "/_astro/cover.hash.png") or null.
  */
-export function resolveCoverOrNull(
+export function resolveCoverImageOrNull(
   post: CollectionEntry<"blog">
-): string | null {
+): CoverImage | null {
   const postDir = getPostDir(post)
   const rawCover = post.data.cover
 
@@ -79,7 +85,7 @@ export function resolveCoverOrNull(
     const candidatePath = `${postDir}${relativeFile}`
     const image = blogImages[candidatePath]
     if (image) {
-      return image.default.src
+      return image.default
     }
   }
 
@@ -88,11 +94,23 @@ export function resolveCoverOrNull(
     const candidatePath = `${postDir}${fallback}`
     const image = blogImages[candidatePath]
     if (image) {
-      return image.default.src
+      return image.default
     }
   }
 
   return null
+}
+
+/**
+ * Resolve the frontmatter `cover` to a built asset URL string, or return
+ * `null` if no real cover image is found (i.e. this post has no cover).
+ *
+ * @returns An absolute URL path (e.g., "/_astro/cover.hash.png") or null.
+ */
+export function resolveCoverOrNull(
+  post: CollectionEntry<"blog">
+): string | null {
+  return resolveCoverImageOrNull(post)?.src ?? null
 }
 
 /**

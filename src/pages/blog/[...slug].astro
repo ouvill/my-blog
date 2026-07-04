@@ -6,6 +6,7 @@ import { getAllPosts } from "@lib/posts"
 import { blogEntryIdToSlug, blogUrlPath } from "@lib/slug"
 import { SITE_CONFIG } from "@lib/site"
 import { resolveCoverOrNull } from "@lib/cover"
+import { descriptionOrExcerpt } from "@lib/excerpt"
 import {
   getPostCategory,
   getPostTags,
@@ -69,12 +70,17 @@ const prevPost =
 const nextPost = currentIndex > 0 ? posts[currentIndex - 1] : null
 
 const relatedPosts = getRelatedPosts(posts, post, 4)
+const description = descriptionOrExcerpt(post.data.description, post.body)
 ---
 
 <BaseLayout
   title={post.data.title}
-  description={post.data.description ?? undefined}
+  description={description}
   image={ogImage}
+  article={{
+    publishedTime: post.data.date.toISOString(),
+    tags: allTags,
+  }}
   canonicalUrl={canonicalUrl}
 >
   <div class="blog-layout">
@@ -306,15 +312,12 @@ const relatedPosts = getRelatedPosts(posts, post, 4)
 
     headings.forEach((h) => observer.observe(h))
 
-    // Clean up when the page is navigated away (view transitions)
-    document.addEventListener(
-      "astro:before-swap",
-      () => observer.disconnect(),
-      { once: true }
-    )
+    window.addEventListener("pagehide", () => observer.disconnect(), {
+      once: true,
+    })
   }
 
-  document.addEventListener("astro:page-load", initTocScrollSpy)
+  initTocScrollSpy()
 </script>
 
 <style>
