@@ -1,0 +1,128 @@
+---
+import BaseLayout from "@components/BaseLayout.astro"
+import { SITE_CONFIG } from "@lib/site"
+
+const title = "検索"
+const description = `${SITE_CONFIG.title} の記事を検索します。`
+---
+
+<BaseLayout title={title} description={description} noindex={true}>
+  <div class="search-page" data-pagefind-ignore>
+    <header class="search-header">
+      <p class="section-kicker">Search</p>
+      <h1>サイト内検索</h1>
+      <p>記事タイトルや本文から検索できます。</p>
+    </header>
+
+    <div class="search-box">
+      <pagefind-input placeholder="キーワードを入力"></pagefind-input>
+      <pagefind-summary></pagefind-summary>
+      <pagefind-results></pagefind-results>
+    </div>
+    <p id="search-status" class="search-status" hidden>
+      検索インデックスはビルド後に生成されます。
+    </p>
+    <noscript>
+      <p class="search-status">
+        サイト内検索を使うには JavaScript を有効にしてください。
+      </p>
+    </noscript>
+  </div>
+
+  <link rel="stylesheet" href="/pagefind/pagefind-component-ui.css" />
+  <script is:inline src="/pagefind/pagefind-component-ui.js" type="module"
+  ></script>
+  <script is:inline>
+    setTimeout(function () {
+      if (customElements.get("pagefind-input")) return
+      var status = document.querySelector("#search-status")
+      if (status) status.hidden = false
+    }, 1000)
+  </script>
+</BaseLayout>
+
+<style>
+  .search-page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 16px 72px;
+  }
+
+  .search-header {
+    margin-bottom: 28px;
+  }
+
+  .section-kicker {
+    margin: 0 0 8px;
+    color: var(--color-accent);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .search-header h1 {
+    margin: 0 0 10px;
+    font-family: var(--font-heading);
+    font-size: 1.9rem;
+    line-height: 1.35;
+  }
+
+  .search-header p:last-child {
+    margin: 0;
+    color: var(--color-text-secondary);
+  }
+
+  .search-box {
+    min-height: 220px;
+    --pf-text: var(--color-text);
+    --pf-text-secondary: var(--color-text-secondary);
+    --pf-text-muted: var(--color-text-muted);
+    --pf-background: var(--color-surface);
+    --pf-border: var(--color-border);
+    --pf-border-focus: var(--color-accent);
+    --pf-hover: var(--color-accent-soft);
+    --pf-mark: var(--color-accent-strong);
+    --pf-outline-focus: var(--color-accent);
+    --pf-font: var(--font-sans);
+    --pf-input-height: 46px;
+    --pf-input-font-size: 16px;
+    --pf-summary-font-size: 0.9rem;
+    --pf-result-title-font-size: 1.05rem;
+    --pf-result-excerpt-font-size: 0.94rem;
+    --pf-results-gap: 12px;
+    --pf-border-radius: 8px;
+    --pf-image-width: 0;
+    --pf-image-height: 0;
+  }
+
+  pagefind-input,
+  pagefind-summary,
+  pagefind-results {
+    display: block;
+  }
+
+  pagefind-summary {
+    margin-top: 12px;
+  }
+
+  pagefind-results {
+    margin-top: 18px;
+  }
+
+  .search-status {
+    margin: 12px 0 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 640px) {
+    .search-page {
+      padding-top: 32px;
+    }
+
+    .search-header h1 {
+      font-size: 1.65rem;
+    }
+  }
+</style>
