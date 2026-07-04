@@ -5,6 +5,9 @@ dist/
 # Astro cache
 .astro/
 
+# Playwright CLI snapshots
+.playwright-cli/
+
 # Netlify CLI local state (legacy — migrated to Cloudflare Pages)
 .netlify/
 
