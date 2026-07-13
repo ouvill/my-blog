@@ -17,7 +17,7 @@
     "worker:check": "npm run build && wrangler deploy --dry-run"
   },
   "dependencies": {
-    "@astrojs/mdx": "^7.0.2",
+    "@astrojs/mdx": "^7.0.3",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.3",
     "@resvg/resvg-js": "^2.6.2",
