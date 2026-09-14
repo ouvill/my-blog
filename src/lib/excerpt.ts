@@ -21,7 +21,7 @@ export function toExcerpt(
 
 export function descriptionOrExcerpt(
   description: string | null | undefined,
-  body: string
+  body = ""
 ): string {
   const normalizedDescription = description?.trim()
 

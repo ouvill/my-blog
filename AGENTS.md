@@ -14,7 +14,7 @@
 | `npm run dev` | `astro dev --host 0.0.0.0` | Dev server at `http://localhost:4321` |
 | `npm run build` | `astro build` | Production build → `dist/` |
 | `npm run preview` | `astro preview` | Preview production build locally |
-| `npm run typecheck` | `astro check` | Astro type checking (uses `@astrojs/check`) |
+| `npm run typecheck` | `astro check && node node_modules/@typescript/native/bin/tsc --noEmit` | Astro checks with TypeScript 6, then TypeScript 7 checks |
 | `npm run clean` | `rm -rf dist .astro` | Remove build and dev cache |
 | `npm run format` | `prettier --write 'src/**/*.{astro,ts,tsx,js,jsx}'` | Format with Prettier |
 
@@ -38,6 +38,7 @@ dist/                 # Build output (gitignored)
 
 - **`astro.config.mjs`**: Site URL, trailing slashes, Sitemap integration, Shiki theme.
 - **`tsconfig.json`**: `strict: true`, path aliases `@lib/*` and `@components/*`.
+- **TypeScript**: npm aliases provide TypeScript 7 as `@typescript/native` (`tsc`) and the TypeScript 6 compatibility package as `typescript` (`tsc6`, required by `@astrojs/check`). See `README.md`.
 - **`.prettierrc`**: LF, no semicolons, double quotes, tabWidth 2, trailingComma es5.
 
 ## Content sources

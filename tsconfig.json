@@ -8,10 +8,9 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
     "paths": {
-      "@lib/*": ["src/lib/*"],
-      "@components/*": ["src/components/*"]
+      "@lib/*": ["./src/lib/*"],
+      "@components/*": ["./src/components/*"]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true,
@@ -19,6 +18,11 @@
     "isolatedModules": true,
     "jsx": "preserve"
   },
-  "include": ["src/**/*", "functions/**/*", "astro.config.mjs"],
+  "include": [
+    ".astro/types.d.ts",
+    "src/**/*",
+    "functions/**/*",
+    "astro.config.mjs"
+  ],
   "exclude": ["src/content/blog/**/src/**/*"]
 }

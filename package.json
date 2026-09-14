@@ -9,7 +9,7 @@
     "build": "astro build",
     "postbuild": "pagefind --site dist",
     "preview": "astro preview",
-    "typecheck": "astro check",
+    "typecheck": "astro check && node node_modules/@typescript/native/bin/tsc --noEmit",
     "clean": "rm -rf dist .astro",
     "format": "prettier --write 'src/**/*.{astro,ts,tsx,js,jsx}'",
     "worker:dev": "wrangler dev",
@@ -27,10 +27,11 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@typescript/native": "npm:typescript@^7.0.2",
     "pagefind": "^1.5.2",
     "prettier": "^3.9.6",
     "prettier-plugin-astro": "^1.0.0",
-    "typescript": "^6.0.3",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
     "wrangler": "^4.131.1"
   }
 }
