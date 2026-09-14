@@ -13,6 +13,20 @@ npm run preview    # ビルド結果のプレビュー
 npm run typecheck  # 型チェック
 ```
 
+型チェックでは、`astro check` による Astro ファイルの検査と、
+TypeScript 7 による TypeScript ファイルの検査を順に実行します。
+`astro check` は TypeScript 6 の API を必要とするため、
+[TypeScript 公式の併用構成](https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/#running-side-by-side-with-typescript-6-0)
+に従って npm エイリアスを使っています。
+
+| npm パッケージ名 | 使用する実装 | 用途 |
+|---|---|---|
+| `@typescript/native` | `typescript` 7 | `tsc` コマンド |
+| `typescript` | `@typescript/typescript6` 6 | `astro check` の内部 API と `tsc6` コマンド |
+
+`typecheck` は `node node_modules/@typescript/native/bin/tsc --noEmit` を使い、
+インストール順にかかわらず TypeScript 7 を実行します。
+
 ## プロジェクト構造
 
 ```
