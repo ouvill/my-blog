@@ -6,6 +6,11 @@ Astro ベースの静的サイトです。
 
 ## 開発
 
+Node.js 24 LTS を使用します。CI と Cloudflare のビルドで使うバージョンは
+[.node-version](./.node-version) に指定しています（現在は `24.22.1`）。
+ローカルでも同じバージョンをインストールしてから `npm ci` を実行してください。
+Dev Container も Node.js 24 系のイメージを使い、Node.js Feature で `24.22.1` を指定しています。
+
 ```bash
 npm run dev        # 開発サーバー起動 (http://localhost:4321)
 npm run build      # プロダクションビルド
