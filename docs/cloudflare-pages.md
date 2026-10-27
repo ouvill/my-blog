@@ -8,7 +8,7 @@
 
 1. **Cloudflare Pages ダッシュボード** — プロジェクト作成、Framework preset を **Astro**（推奨）に設定
 2. **ビルド設定** — Build command `npm run build`、Build output directory `dist`
-3. **環境変数** — `NODE_VERSION=22`、`CONTACT_TO_EMAIL`、`CONTACT_FROM_EMAIL` を設定
+3. **環境変数** — Node.js は `.node-version` の `24.22.1` を使用。`NODE_VERSION` を設定する場合も同じ値にし、`CONTACT_TO_EMAIL`、`CONTACT_FROM_EMAIL` を設定
 4. **D1 データベース作成** — `wrangler d1 create ouvill-blog-contact`
 5. **wrangler.toml** — `[[d1_databases]]` のコメントを外し、`database_id` を設定。`[[send_email]]` バインディングも追記
 6. **Migration 適用** — `wrangler d1 execute ouvill-blog-contact --remote --file=./migrations/0001_create_contact_submissions.sql`
@@ -35,10 +35,13 @@ Cloudflare Pages ダッシュボード → 該当プロジェクト → **Settin
 | Framework preset | **Astro**（推奨）または **None** |
 | Build command | `npm run build` |
 | Build output directory | `dist` |
-| Node.js version | **22**（環境変数 `NODE_VERSION=22` を設定） |
+| Node.js version | **24.22.1**（リポジトリ直下の `.node-version` で指定） |
 
-> Node.js 22 を指定しないとデフォルトの古いバージョンが使われ、ビルドが失敗します。
-> Framework preset に Astro を選ぶと自動的に適切な Node バージョンが選択される場合もありますが、明示的に `NODE_VERSION=22` を設定することを推奨します。
+Node.js のバージョンは `.node-version` にまとめ、GitHub Actions と Cloudflare のビルドで共有します。
+[Cloudflare Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/build-image/)
+と [Cloudflare Pages](https://developers.cloudflare.com/pages/configuration/build-image/)
+はいずれも `.node-version` を読み取ります。
+ダッシュボードで `NODE_VERSION` を設定している場合は削除するか、`.node-version` と同じ値に揃えてください。
 
 ## 環境変数とバインディング
 
@@ -48,7 +51,7 @@ Cloudflare Pages ダッシュボード → 該当プロジェクト → **Settin
 
 | Variable name | Value | 用途 |
 |---|---|---|
-| `NODE_VERSION` | `22` | ビルド時の Node.js バージョン固定 |
+| `NODE_VERSION` | `24.22.1`（設定する場合） | 通常は `.node-version` を使用。設定する場合は同じ値に揃える |
 | `CONTACT_TO_EMAIL` | `<受信メールアドレス>` | お問い合わせの送信先 |
 | `CONTACT_FROM_EMAIL` | `<送信元メールアドレス>` | Email Sending で検証済みドメインのアドレス |
 

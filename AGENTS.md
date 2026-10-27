@@ -5,7 +5,7 @@
 - This is a Japanese-language technical blog (blog.ouvill.net) built on **Astro v7**.
 - Author GitHub: `Ouvill` / repo: `Ouvill/gatsbyjs_blog`.
 - Lockfile is **package-lock.json** only; no yarn.lock exists.
-- CI workflow (`.github/workflows/node.js.yml`) runs `npm ci`, `npm run typecheck`, `npm run build` on push/PR to master with Node 22.
+- CI workflow (`.github/workflows/ci.yml`) runs `npm ci`, `npm run typecheck`, `npm run build` on push/PR to master with Node 24, pinned in `.node-version`.
 
 ## Commands
 
@@ -53,5 +53,5 @@ dist/                 # Build output (gitignored)
 
 ## Deploy
 
-- **Cloudflare Pages** (primary): `wrangler.toml` — build output `dist`, Node 22. See `docs/cloudflare-pages.md`.
+- **Cloudflare Pages** (primary): `wrangler.toml` — build output `dist`, Node 24 (see `.node-version`). See `docs/cloudflare-pages.md`.
 - Sitemap (`@astrojs/sitemap`) and RSS (`@astrojs/rss`) are generated at build time.
