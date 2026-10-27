@@ -26,7 +26,7 @@ const tag = normalizeTagName(decodeTaxonomyParam(Astro.params.tag))
 const filteredPosts = filterPostsByTaxonomy(posts, "tags", tag)
 
 if (filteredPosts.length === 0) {
-  return Astro.redirect("/404", 404)
+  return Astro.rewrite("/404")
 }
 
 const title = `#${tag} の記事`

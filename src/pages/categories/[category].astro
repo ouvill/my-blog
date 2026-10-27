@@ -28,7 +28,7 @@ const category = normalizeCategoryName(
 const filteredPosts = filterPostsByTaxonomy(posts, "categories", category)
 
 if (filteredPosts.length === 0) {
-  return Astro.redirect("/404", 404)
+  return Astro.rewrite("/404")
 }
 
 const title = `${category} カテゴリの記事`
