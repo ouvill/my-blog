@@ -24,7 +24,7 @@ const page = allPages.find(
 )
 
 if (!page) {
-  return Astro.redirect("/404", 404)
+  return Astro.rewrite("/404")
 }
 
 const { Content } = await render(page)
